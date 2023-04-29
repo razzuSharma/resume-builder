@@ -1,14 +1,14 @@
 import Navbar from "./components/Navbar";
-// import InputForms from "./components/InputForms";
+import InputForms from "./components/InputForms";
 import AddressDetails from "./components/AddressDetails";
 import EducationDetails from "./components/EducationDetails"
 function App() {
   return (
     <>
       <Navbar />
-      {/* <InputForms /> */}
+      <InputForms />
       {/* <AddressDetails/> */}
-      <EducationDetails/>
+      {/* <EducationDetails/> */}
     </>
   );
 }
