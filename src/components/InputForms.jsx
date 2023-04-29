@@ -1,12 +1,20 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { setFormData } from "../app/createSliceInputForms";
 
 function InputForms() {
+  // const formData = useSelector((state) => state.form.formData);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const dispatch = useDispatch();
+  const onSubmit = (data) => {
+    dispatch(setFormData(data));
+  };
 
   return (
     <div className="">
@@ -14,7 +22,7 @@ function InputForms() {
         Enter your details:
       </h1>
       <div className="flex gap-2 m-5 items-center justify-center">
-        <form onSubmit={handleSubmit((data) => console.log(data))}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-2 md:gap-6">
             <div className="relative z-0 w-full mb-6 group">
               <input
