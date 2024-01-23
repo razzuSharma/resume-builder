@@ -6,20 +6,25 @@ import { roboto_mono } from "../fonts";
 
 const HomeComponent = () => {
   const imageLink = "/okay-bg.jpg";
+  const downArrow = "/down-arrow.png";
 
   return (
     <section className="flex justify-center items-center h-screen">
       <div className="container grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="flex flex-col justify-center items-center md:items-start">
+        <div className="flex flex-col justify-center items-center md:items-start relative">
           <h1
             className={`${roboto_mono.className} text-6xl md:text-5xl font-bold mb-4 text-teal-600`}
           >
             Hello there,
           </h1>
-          <p className={`${roboto_mono.className} text-lg leading-relaxed mb-4 text-gray-700`}>
+          <p
+            className={`${roboto_mono.className} text-lg leading-relaxed mb-4 text-gray-700`}
+          >
             Ready to embark on a journey to create something extraordinary?
           </p>
-          <p className={`${roboto_mono.className} text-base leading-relaxed mb-4 text-gray-700`}>
+          <p
+            className={`${roboto_mono.className} text-base leading-relaxed mb-4 text-gray-700`}
+          >
             Welcome to a place where you can craft a compelling resume for your
             professional journey. Construct an impressive story and share your
             experiences with us{" "}
@@ -32,9 +37,14 @@ const HomeComponent = () => {
               </Link>
             </span>
           </p>
-          <DynamicLink variant="teal" href="/create-resume">
-            Get Started
-          </DynamicLink>
+          <div className="relative mt-10">
+            <DynamicLink variant="teal" href="/create-resume">
+              Get Started
+            </DynamicLink>
+            <div className="absolute -top-11 right-20">
+              <Image src={downArrow} alt="Down Arrow" height={50} width={50} />
+            </div>
+          </div>
         </div>
 
         <div className="text-center md:text-right rounded-full overflow-hidden">
