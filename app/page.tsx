@@ -1,8 +1,12 @@
-import Image from 'next/image'
-import Navbar from './navbar/page'
+import React from "react";
+import HomeComponent from "./pages/HomeComponent";
 
-export default function Home() {
+const Home = () => {
   return (
-      <Navbar/>
-  )
-}
+    <>
+      <HomeComponent />
+    </>
+  );
+};
+
+export default Home;
