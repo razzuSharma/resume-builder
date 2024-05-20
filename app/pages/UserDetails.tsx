@@ -1,6 +1,11 @@
-"use client";
+// UserDetails.tsx
+"use client"
 import * as React from "react";
 import { Formik, Form, Field } from "formik";
+
+interface UserDetailsProps {
+  onNext: () => void; // Define onNext prop in interface
+}
 
 interface MyFormValues {
   firstName: string;
@@ -32,7 +37,7 @@ const InputField: React.FC<{
   </div>
 );
 
-export const UserDetails: React.FC<{}> = () => {
+const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
   const initialValues: MyFormValues = {
     firstName: "",
     lastName: "",
@@ -48,6 +53,7 @@ export const UserDetails: React.FC<{}> = () => {
           console.log({ values, actions });
           alert(JSON.stringify(values, null, 2));
           actions.setSubmitting(false);
+          onNext(); // Call onNext function after form submission
         }}
       >
         {({ handleReset }) => (
@@ -79,3 +85,5 @@ export const UserDetails: React.FC<{}> = () => {
     </div>
   );
 };
+
+export default UserDetails;

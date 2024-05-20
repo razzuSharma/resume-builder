@@ -1,13 +1,29 @@
-"use client";
+"use client"
 import React, { useState } from "react";
-import { UserDetails } from "../pages/UserDetails";
+import UserDetails from "../pages/UserDetails";
 import { EducationDetails } from "../pages/EducationDetails";
 import { ExperienceDetails } from "../pages/ExperienceDetails";
+
 const ResumePage = () => {
   const [activeTab, setActiveTab] = useState("userDetails");
 
-  const handleTabClick = (tab: any) => {
+  const handleTabClick = (tab:any) => {
     setActiveTab(tab);
+  };
+
+  const handleFormSubmit = () => {
+    // Move to the next tab after form submission
+    switch (activeTab) {
+      case "userDetails":
+        setActiveTab("EducationDetails");
+        break;
+      case "EducationDetails":
+        setActiveTab("ExperienceDetails");
+        break;
+      // Add more cases if needed
+      default:
+        break;
+    }
   };
 
   // Common button styles
@@ -66,9 +82,9 @@ const ResumePage = () => {
               className={`${buttonStyles} ${
                 activeTab === "ExperienceDetails" ? activeButtonStyles : ""
               }`}
-              id="vertical-tab-with-border-item-2"
-              data-hs-tab="#vertical-tab-with-border-2"
-              aria-controls="vertical-tab-with-border-2"
+              id="vertical-tab-with-border-item-3"
+              data-hs-tab="#vertical-tab-with-border-3"
+              aria-controls="vertical-tab-with-border-3"
               role="tab"
               aria-selected={
                 activeTab === "ExperienceDetails" ? "true" : "false"
@@ -85,10 +101,16 @@ const ResumePage = () => {
             aria-labelledby="vertical-tab-with-border-item-1"
           >
             <div className="mt-4">
-              {/* Render UserDetails or EducationDetails based on activeTab */}
-              {activeTab === "userDetails" && <UserDetails />}
-              {activeTab === "EducationDetails" && <EducationDetails />}
-              {activeTab === "ExperienceDetails" && <ExperienceDetails />}
+              {/* Render UserDetails or EducationDetails or ExperienceDetails based on activeTab */}
+              {activeTab === "userDetails" && (
+                <UserDetails onNext={handleFormSubmit} />
+              )}
+              {activeTab === "EducationDetails" && (
+                <EducationDetails onNext={handleFormSubmit} />
+              )}
+              {activeTab === "ExperienceDetails" && (
+                <ExperienceDetails onNext={handleFormSubmit} />
+              )}
             </div>
           </div>
         </div>

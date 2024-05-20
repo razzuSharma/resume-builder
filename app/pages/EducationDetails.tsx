@@ -7,6 +7,9 @@ interface MyFormValues {
   fieldOfStudy: string;
   graduationYear: string;
 }
+interface EducationDetailsProps {
+  onNext: () => void; // Define onNext prop in interface
+}
 
 // Reusable InputField component
 const InputField: React.FC<{
@@ -31,7 +34,7 @@ const InputField: React.FC<{
   </div>
 );
 
-export const EducationDetails: React.FC<{}> = () => {
+export const EducationDetails: React.FC<EducationDetailsProps> = ({ onNext }) => {
   const initialValues: MyFormValues = {
     schoolName: "",
     degree: "",
@@ -47,6 +50,7 @@ export const EducationDetails: React.FC<{}> = () => {
           console.log({ values, actions });
           alert(JSON.stringify(values, null, 2));
           actions.setSubmitting(false);
+          onNext()
         }}
       >
         {({ handleReset }) => (

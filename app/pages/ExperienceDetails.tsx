@@ -10,6 +10,10 @@ interface Experience {
   responsibilities: string[]; // Array of responsibilities
 }
 
+interface ExperienceDetailsProps{
+  onNext: () => void; // Define onNext prop in interface
+}
+
 interface MyFormValues {
   experiences: Experience[];
 }
@@ -37,7 +41,7 @@ const InputField: React.FC<{
   </div>
 );
 
-export const ExperienceDetails: React.FC<{}> = () => {
+export const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({onNext}) => {
   const initialValues: MyFormValues = {
     experiences: [
       {
@@ -58,6 +62,7 @@ export const ExperienceDetails: React.FC<{}> = () => {
           console.log({ values, actions });
           alert(JSON.stringify(values, null, 2));
           actions.setSubmitting(false);
+          onNext()
         }}
       >
         {({ handleReset, values }) => (
