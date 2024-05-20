@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { UserDetails } from "../pages/UserDetails";
 import { EducationDetails } from "../pages/EducationDetails";
-
+import { ExperienceDetails } from "../pages/ExperienceDetails";
 const ResumePage = () => {
   const [activeTab, setActiveTab] = useState("userDetails");
 
@@ -10,16 +10,15 @@ const ResumePage = () => {
     setActiveTab(tab);
   };
 
-  
   // Common button styles
   const buttonStyles =
-    "hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 inline-flex items-center gap-x-2 border-e-2 border-transparent whitespace-nowrap text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-none disabled:opacity-50 disabled:pointer-events-none active";
+    "hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 inline-flex items-center gap-x-2 border-e-2 border-transparent whitespace-nowrap text-gray-500 hover:text-blue-600 hover:text-xl focus:text-blue-600 focus:outline-none disabled:opacity-50 disabled:pointer-events-none active";
   const activeButtonStyles = "text-blue-500 text-2xl";
 
   return (
-    <div className="container mx-auto mt-20 p-4 flex flex-col justify-center align-middle">
+    <div className="container mx-auto mt-20 p-4 flex flex-col justify-center">
       <div className="flex">
-        <div className="w-1/4 border-e border-gray-200 flex gap-2 items-center justify-center">
+        <div className="w-1/4 border-e border-gray-200 flex py-4 items-center justify-center">
           <nav
             className="flex flex-col space-y-2"
             aria-label="Tabs"
@@ -59,6 +58,24 @@ const ResumePage = () => {
             >
               Education Details
             </button>
+
+            {/* Experience Details Tab */}
+            <button
+              onClick={() => handleTabClick("ExperienceDetails")}
+              type="button"
+              className={`${buttonStyles} ${
+                activeTab === "ExperienceDetails" ? activeButtonStyles : ""
+              }`}
+              id="vertical-tab-with-border-item-2"
+              data-hs-tab="#vertical-tab-with-border-2"
+              aria-controls="vertical-tab-with-border-2"
+              role="tab"
+              aria-selected={
+                activeTab === "ExperienceDetails" ? "true" : "false"
+              }
+            >
+              Experience Details
+            </button>
           </nav>
         </div>
         <div className="w-3/4 ms-3">
@@ -71,6 +88,7 @@ const ResumePage = () => {
               {/* Render UserDetails or EducationDetails based on activeTab */}
               {activeTab === "userDetails" && <UserDetails />}
               {activeTab === "EducationDetails" && <EducationDetails />}
+              {activeTab === "ExperienceDetails" && <ExperienceDetails />}
             </div>
           </div>
         </div>
