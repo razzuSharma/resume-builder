@@ -31,7 +31,7 @@ const HomeComponent = () => {
             <span className="mr-4">
               <Link
                 href="/contact-us"
-                className="text-ellipsis cursor-pointer underline text-red-500 hover:text-green-800"
+                className="text-ellipsis cursor-pointer text-red-500 hover:text-green-800 hover:underline"
               >
                 here.
               </Link>
