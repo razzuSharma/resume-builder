@@ -16,6 +16,9 @@ const config: Config = {
       scale: {
         "-100": "-1",
       },
+      boxShadow: {
+        teal: "0 4px 6px rgba(0, 128, 128, 0.4)", // Custom teal shadow
+      },
     },
   },
   plugins: [],

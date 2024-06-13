@@ -1,20 +1,24 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import UserDetails from "../pages/UserDetails";
 import { EducationDetails } from "../pages/EducationDetails";
 import { ExperienceDetails } from "../pages/ExperienceDetails";
 
 const ResumePage = () => {
-  const [activeTab, setActiveTab] = useState("userDetails");
+  const [activeTab, setActiveTab] = useState<
+    "UserDetails" | "EducationDetails" | "ExperienceDetails"
+  >("UserDetails");
 
-  const handleTabClick = (tab:any) => {
+  const handleTabClick = (
+    tab: "UserDetails" | "EducationDetails" | "ExperienceDetails"
+  ) => {
     setActiveTab(tab);
   };
 
   const handleFormSubmit = () => {
     // Move to the next tab after form submission
     switch (activeTab) {
-      case "userDetails":
+      case "UserDetails":
         setActiveTab("EducationDetails");
         break;
       case "EducationDetails":
@@ -28,90 +32,46 @@ const ResumePage = () => {
 
   // Common button styles
   const buttonStyles =
-    "hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 inline-flex items-center gap-x-2 border-e-2 border-transparent whitespace-nowrap text-gray-500 hover:text-blue-600 hover:text-xl focus:text-blue-600 focus:outline-none disabled:opacity-50 disabled:pointer-events-none active";
-  const activeButtonStyles = "text-blue-500 text-2xl";
+    "py-3 px-5 items-center text-center gap-x-3 border-gray-200 whitespace-nowrap text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-none disabled:opacity-50 disabled:pointer-events-none transition-colors duration-300 ease-in-out hover:bg-gray-100 hover:border-gray-300 rounded-2xl";
+  const activeButtonStyles = "text-blue-500";
+
+  // Tab contents
+  const tabContent: { [key: string]: JSX.Element } = {
+    UserDetails: <UserDetails onNext={handleFormSubmit} />,
+    EducationDetails: <EducationDetails onNext={handleFormSubmit} />,
+    ExperienceDetails: <ExperienceDetails onNext={handleFormSubmit} />,
+  };
 
   return (
-    <div className="container mx-auto mt-20 p-4 flex flex-col justify-center">
+    <div className="container mx-auto mt-20 p-4">
       <div className="flex">
-        <div className="w-1/4 border-e border-gray-200 flex py-4 items-center justify-center">
-          <nav
-            className="flex flex-col space-y-2"
-            aria-label="Tabs"
-            role="tablist"
-            data-hs-tabs-vertical="true"
-          >
-            {/* Personal Information Tab */}
-            <button
-              onClick={() => handleTabClick("userDetails")}
-              type="button"
-              className={`${buttonStyles} ${
-                activeTab === "userDetails" ? activeButtonStyles : ""
-              }`}
-              id="vertical-tab-with-border-item-1"
-              data-hs-tab="#vertical-tab-with-border-1"
-              aria-controls="vertical-tab-with-border-1"
-              role="tab"
-              aria-selected={activeTab === "userDetails" ? "true" : "false"}
-            >
-              Personal Information
-            </button>
-
-            {/* Education Details Tab */}
-            <button
-              onClick={() => handleTabClick("EducationDetails")}
-              type="button"
-              className={`${buttonStyles} ${
-                activeTab === "EducationDetails" ? activeButtonStyles : ""
-              }`}
-              id="vertical-tab-with-border-item-2"
-              data-hs-tab="#vertical-tab-with-border-2"
-              aria-controls="vertical-tab-with-border-2"
-              role="tab"
-              aria-selected={
-                activeTab === "EducationDetails" ? "true" : "false"
-              }
-            >
-              Education Details
-            </button>
-
-            {/* Experience Details Tab */}
-            <button
-              onClick={() => handleTabClick("ExperienceDetails")}
-              type="button"
-              className={`${buttonStyles} ${
-                activeTab === "ExperienceDetails" ? activeButtonStyles : ""
-              }`}
-              id="vertical-tab-with-border-item-3"
-              data-hs-tab="#vertical-tab-with-border-3"
-              aria-controls="vertical-tab-with-border-3"
-              role="tab"
-              aria-selected={
-                activeTab === "ExperienceDetails" ? "true" : "false"
-              }
-            >
-              Experience Details
-            </button>
+        <div className="w-1/4 flex items-center justify-center">
+          <nav className="flex flex-col space-y-2">
+            {Object.keys(tabContent).map((tab, index) => (
+              <button
+                key={index}
+                onClick={() =>
+                  handleTabClick(
+                    tab as
+                      | "UserDetails"
+                      | "EducationDetails"
+                      | "ExperienceDetails"
+                  )
+                }
+                type="button"
+                className={`${buttonStyles} ${
+                  activeTab === tab ? activeButtonStyles : ""
+                } rounded-2xl bg-gray-100 hover:bg-gray-200`}
+                aria-selected={activeTab === tab ? "true" : "false"}
+              >
+                {tab.replace(/([a-z])([A-Z])/g, "$1 $2")}
+              </button>
+            ))}
           </nav>
         </div>
         <div className="w-3/4 ms-3">
-          <div
-            id="vertical-tab-with-border-1"
-            role="tabpanel"
-            aria-labelledby="vertical-tab-with-border-item-1"
-          >
-            <div className="mt-4">
-              {/* Render UserDetails or EducationDetails or ExperienceDetails based on activeTab */}
-              {activeTab === "userDetails" && (
-                <UserDetails onNext={handleFormSubmit} />
-              )}
-              {activeTab === "EducationDetails" && (
-                <EducationDetails onNext={handleFormSubmit} />
-              )}
-              {activeTab === "ExperienceDetails" && (
-                <ExperienceDetails onNext={handleFormSubmit} />
-              )}
-            </div>
+          <div className="transition-opacity duration-300 ease-in-out">
+            {tabContent[activeTab]}
           </div>
         </div>
       </div>
