@@ -32,8 +32,9 @@ const ResumePage = () => {
 
   // Common button styles
   const buttonStyles =
-    "py-3 px-5 items-center text-center gap-x-3 border-gray-200 whitespace-nowrap text-gray-500 hover:text-blue-600 focus:text-blue-600 focus:outline-none disabled:opacity-50 disabled:pointer-events-none transition-colors duration-300 ease-in-out hover:bg-gray-100 hover:border-gray-300 rounded-2xl";
-  const activeButtonStyles = "text-blue-500";
+    "py-3 px-5 items-center text-center gap-x-3 border border-gray-200 text-gray-500  focus:outline-none disabled:opacity-50 disabled:pointer-events-none transition-colors duration-300 ease-in-out rounded-2xl";
+  const activeButtonStyles = "bg-teal-200";
+  const hoverStyles = "hover:bg-teal-100 hover:border-teal-300";
 
   // Tab contents
   const tabContent: { [key: string]: JSX.Element } = {
@@ -43,7 +44,7 @@ const ResumePage = () => {
   };
 
   return (
-    <div className="container mx-auto mt-20 p-4">
+    <div className="container mx-auto bg-gray-100">
       <div className="flex">
         <div className="w-1/4 flex items-center justify-center">
           <nav className="flex flex-col space-y-2">
@@ -60,8 +61,8 @@ const ResumePage = () => {
                 }
                 type="button"
                 className={`${buttonStyles} ${
-                  activeTab === tab ? activeButtonStyles : ""
-                } rounded-2xl bg-gray-100 hover:bg-gray-200`}
+                  activeTab === tab ? activeButtonStyles : hoverStyles
+                }`}
                 aria-selected={activeTab === tab ? "true" : "false"}
               >
                 {tab.replace(/([a-z])([A-Z])/g, "$1 $2")}
