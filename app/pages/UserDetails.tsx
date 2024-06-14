@@ -6,7 +6,6 @@ import ButtonStylings from "../components/Button";
 interface UserDetailsProps {
   onNext: () => void;
 }
-
 interface MyFormValues {
   firstName: string;
   lastName: string;
@@ -62,7 +61,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
               <InputField label="Last Name" name="lastName" />
               <InputField label="Email Address" name="email" type="email" />
               <InputField label="Phone Number" name="phone" type="tel" />
-              <div className="flex justify-end mt-6 gap-4">
+              <div className="flex justify-end mt-6 gap-3">
                 <ButtonStylings
                   variant="teal"
                   onClick={() => {
@@ -85,3 +84,5 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
 };
 
 export default UserDetails;
+
+

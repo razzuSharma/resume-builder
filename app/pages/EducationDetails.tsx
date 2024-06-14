@@ -2,6 +2,7 @@
 "use client";
 import React from "react";
 import { Formik, Form, Field } from "formik";
+import ButtonStylings from "../components/Button";
 
 interface MyFormValues {
   schoolName: string;
@@ -36,7 +37,9 @@ const InputField: React.FC<{
   </div>
 );
 
-export const EducationDetails: React.FC<EducationDetailsProps> = ({ onNext }) => {
+export const EducationDetails: React.FC<EducationDetailsProps> = ({
+  onNext,
+}) => {
   const initialValues: MyFormValues = {
     schoolName: "",
     degree: "",
@@ -62,22 +65,19 @@ export const EducationDetails: React.FC<EducationDetailsProps> = ({ onNext }) =>
               <InputField label="Degree" name="degree" />
               <InputField label="Field of Study" name="fieldOfStudy" />
               <InputField label="Graduation Year" name="graduationYear" />
-              <div className="flex justify-end mt-6">
-                <button
-                  type="button"
+              <div className="flex justify-end mt-6 gap-3">
+                <ButtonStylings
+                  variant="teal"
                   onClick={() => {
                     handleReset();
                   }}
-                  className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2"
                 >
                   Clear
-                </button>
-                <button
-                  type="submit"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
-                >
+                </ButtonStylings>
+
+                <ButtonStylings variant="purple" onClick={() => {}}>
                   Next
-                </button>
+                </ButtonStylings>
               </div>
             </Form>
           )}

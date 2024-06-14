@@ -3,6 +3,7 @@
 import React from "react";
 import { Formik, Form, FieldArray, Field } from "formik";
 import { FiPlus } from "react-icons/fi";
+import ButtonStylings from "../components/Button";
 
 interface Experience {
   companyName: string;
@@ -42,7 +43,9 @@ const InputField: React.FC<{
   </div>
 );
 
-export const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
+export const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({
+  onNext,
+}) => {
   const initialValues: MyFormValues = {
     experiences: [
       {
@@ -133,28 +136,24 @@ export const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) 
                       }
                       className="text-blue-700 hover:text-blue-800"
                     >
-                      <FiPlus className="inline-block w-4 h-4 mr-1" />{" "}
-                      Add More
+                      <FiPlus className="inline-block w-4 h-4 mr-1" /> Add More
                     </button>
                   </div>
                 )}
               />
-              <div className="flex justify-end mt-6">
-                <button
-                  type="button"
+              <div className="flex justify-end mt-6 gap-3">
+                <ButtonStylings
+                  variant="teal"
                   onClick={() => {
                     handleReset();
                   }}
-                  className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2"
                 >
                   Clear
-                </button>
-                <button
-                  type="submit"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5"
-                >
+                </ButtonStylings>
+
+                <ButtonStylings variant="purple" onClick={() => {}}>
                   Next
-                </button>
+                </ButtonStylings>
               </div>
             </Form>
           )}
