@@ -70,7 +70,6 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
                 >
                   Clear
                 </ButtonStylings>
-
                 <ButtonStylings variant="purple" onClick={() => {}}>
                   Next
                 </ButtonStylings>

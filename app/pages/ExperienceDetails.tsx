@@ -121,7 +121,7 @@ const AccordionSection: React.FC<{
   </div>
 );
 
-export const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
+const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
   const initialValues: MyFormValues = {
     experiences: [
       {
@@ -213,3 +213,4 @@ export const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) 
   );
 };
 
+export default ExperienceDetails;

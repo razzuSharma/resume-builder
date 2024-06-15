@@ -1,19 +1,30 @@
 "use client";
 import React, { useState } from "react";
 import UserDetails from "../pages/UserDetails";
-import { EducationDetails } from "../pages/EducationDetails";
-import { ExperienceDetails } from "../pages/ExperienceDetails";
+import EducationDetails from "../pages/EducationDetails";
+import ExperienceDetails from "../pages/ExperienceDetails";
 import HobbiesDetails from "../pages/HobbiesDetails";
 import SkillsDetails from "../pages/SkillsDetails";
 import ProjectDetails from "../pages/ProjectDetails";
 
 const ResumePage = () => {
   const [activeTab, setActiveTab] = useState<
-    "UserDetails" | "EducationDetails" | "ExperienceDetails" | "HobbiesDetails" | "SkillsDetails" | "ProjectDetails"
+    | "UserDetails"
+    | "EducationDetails"
+    | "ExperienceDetails"
+    | "HobbiesDetails"
+    | "SkillsDetails"
+    | "ProjectDetails"
   >("UserDetails");
 
   const handleTabClick = (
-    tab: "UserDetails" | "EducationDetails" | "ExperienceDetails" | "HobbiesDetails" | "SkillsDetails" | "ProjectDetails"
+    tab:
+      | "UserDetails"
+      | "EducationDetails"
+      | "ExperienceDetails"
+      | "HobbiesDetails"
+      | "SkillsDetails"
+      | "ProjectDetails"
   ) => {
     setActiveTab(tab);
   };
@@ -27,14 +38,17 @@ const ResumePage = () => {
       case "EducationDetails":
         setActiveTab("ExperienceDetails");
         break;
-      case "HobbiesDetails":
+      case "ExperienceDetails":
         setActiveTab("HobbiesDetails");
         break;
-      case "SkillsDetails":
+      case "HobbiesDetails":
         setActiveTab("SkillsDetails");
         break;
-      case "ProjectDetails":
+      case "SkillsDetails":
         setActiveTab("ProjectDetails");
+        break;
+      case "ProjectDetails":
+        setActiveTab("UserDetails");
         break;
       // Add more cases if needed
       default:
@@ -53,9 +67,9 @@ const ResumePage = () => {
     UserDetails: <UserDetails onNext={handleFormSubmit} />,
     EducationDetails: <EducationDetails onNext={handleFormSubmit} />,
     ExperienceDetails: <ExperienceDetails onNext={handleFormSubmit} />,
-    HobbiesDetails: <HobbiesDetails  onNext={handleFormSubmit}/>,
-    SkillsDetails: <SkillsDetails  onNext={handleFormSubmit}/>,
-    ProjectDetails: <ProjectDetails  onNext={handleFormSubmit}/>,
+    HobbiesDetails: <HobbiesDetails onNext={handleFormSubmit} />,
+    SkillsDetails: <SkillsDetails onNext={handleFormSubmit} />,
+    ProjectDetails: <ProjectDetails onNext={handleFormSubmit} />,
   };
 
   return (
