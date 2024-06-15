@@ -3,14 +3,17 @@ import React, { useState } from "react";
 import UserDetails from "../pages/UserDetails";
 import { EducationDetails } from "../pages/EducationDetails";
 import { ExperienceDetails } from "../pages/ExperienceDetails";
+import HobbiesDetails from "../pages/HobbiesDetails";
+import SkillsDetails from "../pages/SkillsDetails";
+import ProjectDetails from "../pages/ProjectDetails";
 
 const ResumePage = () => {
   const [activeTab, setActiveTab] = useState<
-    "UserDetails" | "EducationDetails" | "ExperienceDetails"
+    "UserDetails" | "EducationDetails" | "ExperienceDetails" | "HobbiesDetails" | "SkillsDetails" | "ProjectDetails"
   >("UserDetails");
 
   const handleTabClick = (
-    tab: "UserDetails" | "EducationDetails" | "ExperienceDetails"
+    tab: "UserDetails" | "EducationDetails" | "ExperienceDetails" | "HobbiesDetails" | "SkillsDetails" | "ProjectDetails"
   ) => {
     setActiveTab(tab);
   };
@@ -23,6 +26,15 @@ const ResumePage = () => {
         break;
       case "EducationDetails":
         setActiveTab("ExperienceDetails");
+        break;
+      case "HobbiesDetails":
+        setActiveTab("HobbiesDetails");
+        break;
+      case "SkillsDetails":
+        setActiveTab("SkillsDetails");
+        break;
+      case "ProjectDetails":
+        setActiveTab("ProjectDetails");
         break;
       // Add more cases if needed
       default:
@@ -41,6 +53,9 @@ const ResumePage = () => {
     UserDetails: <UserDetails onNext={handleFormSubmit} />,
     EducationDetails: <EducationDetails onNext={handleFormSubmit} />,
     ExperienceDetails: <ExperienceDetails onNext={handleFormSubmit} />,
+    HobbiesDetails: <HobbiesDetails  onNext={handleFormSubmit}/>,
+    SkillsDetails: <SkillsDetails  onNext={handleFormSubmit}/>,
+    ProjectDetails: <ProjectDetails  onNext={handleFormSubmit}/>,
   };
 
   return (
@@ -57,6 +72,9 @@ const ResumePage = () => {
                       | "UserDetails"
                       | "EducationDetails"
                       | "ExperienceDetails"
+                      | "HobbiesDetails"
+                      | "SkillsDetails"
+                      | "ProjectDetails"
                   )
                 }
                 type="button"
