@@ -3,10 +3,13 @@
 import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import ButtonStylings from "../components/Button";
+// import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+import { saveDataIntoSupabase } from "../utils/supabaseUtils";
 interface UserDetailsProps {
   onNext: () => void;
 }
-interface MyFormValues {
+export interface MyFormValues {
   firstName: string;
   lastName: string;
   email: string;
@@ -48,10 +51,11 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
       <div className="bg-white md:p-8 rounded-2xl shadow-xl shadow-teal-200 w-full max-w-md">
         <Formik
           initialValues={initialValues}
-          onSubmit={(values, actions) => {
-            console.log({ values, actions });
+          onSubmit={async (values, actions) => {
+            // console.log({ values, actions });
             alert(JSON.stringify(values, null, 2));
             actions.setSubmitting(false);
+            await saveDataIntoSupabase("personal_details", values);
             onNext();
           }}
         >
@@ -60,7 +64,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
               <InputField label="First Name" name="firstName" />
               <InputField label="Last Name" name="lastName" />
               <InputField label="Email Address" name="email" type="email" />
-              <InputField label="Phone Number" name="phone" type="tel" />
+              <InputField label="Phone Number" name="phone" />
               <div className="flex justify-end mt-6 gap-3">
                 <ButtonStylings
                   variant="teal"
@@ -83,5 +87,3 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
 };
 
 export default UserDetails;
-
-
