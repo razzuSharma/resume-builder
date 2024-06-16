@@ -10,6 +10,7 @@ interface Project {
   name: string;
   startDate: string;
   endDate: string;
+  present: boolean;
   link: string;
   skillsLearned: string;
 }
@@ -26,7 +27,8 @@ const InputField: React.FC<{
   label: string;
   name: string;
   type?: string;
-}> = ({ label, name, type = "text" }) => (
+  disabled?: boolean;
+}> = ({ label, name, type = "text", disabled = false }) => (
   <div className="relative z-0 w-full mb-6 group">
     <Field
       type={type}
@@ -34,6 +36,7 @@ const InputField: React.FC<{
       id={name}
       className="block py-2.5 px-0 w-full text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-teal-600 peer"
       required
+      disabled={disabled}
     />
     <label
       htmlFor={name}
@@ -50,79 +53,103 @@ const AccordionSection: React.FC<{
   toggleAccordion: (index: number) => void;
   project: Project;
   arrayHelpers: any;
-}> = ({ index, expandedIndex, toggleAccordion, project, arrayHelpers }) => (
-  <div className="mb-4">
-    <button
-      type="button"
-      className="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-teal-500 border border-b-0 border-teal-200 rounded-t-xl dark:border-teal-700 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-800 gap-3"
-      onClick={() => toggleAccordion(index)}
-      aria-expanded={expandedIndex === index ? "true" : "false"}
-      aria-controls={`accordion-body-${index}`}
-    >
-      <span className="flex items-center">
-        <FiPlus
-          className={`w-5 h-5 me-2 ${
-            expandedIndex === index ? "hidden" : "block"
-          }`}
-        />
-        <FiMinus
-          className={`w-5 h-5 me-2 ${
-            expandedIndex === index ? "block" : "hidden"
-          }`}
-        />
-        Project {index + 1}
-      </span>
-      <svg
-        data-accordion-icon
-        className={`w-3 h-3 rotate-${
-          expandedIndex === index ? "180" : "0"
-        } shrink-0`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 6"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M9 5 5 1 1 5"
-        />
-      </svg>
-    </button>
-    <div
-      id={`accordion-body-${index}`}
-      className={`${
-        expandedIndex === index ? "block" : "hidden"
-      } border border-teal-300 rounded-lg p-4`}
-    >
-      <InputField label="Project Name" name={`projects.${index}.name`} />
-      <InputField
-        label="Start Date"
-        name={`projects.${index}.startDate`}
-        type="date"
-      />
-      <InputField
-        label="End Date"
-        name={`projects.${index}.endDate`}
-        type="date"
-      />
-      <InputField label="Project Link" name={`projects.${index}.link`} />
-      <InputField
-        label="Skills Learned"
-        name={`projects.${index}.skillsLearned`}
-      />
+  values: MyFormValues;
+  setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
+}> = ({ index, expandedIndex, toggleAccordion, project, arrayHelpers, values, setFieldValue }) => {
+  const isPresent = values.projects[index].present;
+
+  const handlePresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFieldValue(`projects.${index}.present`, e.target.checked);
+    if (e.target.checked) {
+      setFieldValue(`projects.${index}.endDate`, "");
+    }
+  };
+
+  return (
+    <div className="mb-4">
       <button
         type="button"
-        onClick={() => arrayHelpers.remove(index)}
-        className="flex items-center py-2 px-4 mt-2 bg-red-500 text-white rounded-2xl hover:bg-red-600 focus:outline-none transition-colors duration-300"
+        className="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-teal-500 border border-b-0 border-teal-200 rounded-t-xl dark:border-teal-700 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-800 gap-3"
+        onClick={() => toggleAccordion(index)}
+        aria-expanded={expandedIndex === index ? "true" : "false"}
+        aria-controls={`accordion-body-${index}`}
       >
-        <FiMinus className="w-5 h-5 mr-2" /> Remove
+        <span className="flex items-center">
+          <FiPlus
+            className={`w-5 h-5 me-2 ${
+              expandedIndex === index ? "hidden" : "block"
+            }`}
+          />
+          <FiMinus
+            className={`w-5 h-5 me-2 ${
+              expandedIndex === index ? "block" : "hidden"
+            }`}
+          />
+          Project {index + 1}
+        </span>
+        <svg
+          data-accordion-icon
+          className={`w-3 h-3 rotate-${
+            expandedIndex === index ? "180" : "0"
+          } shrink-0`}
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 10 6"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M9 5 5 1 1 5"
+          />
+        </svg>
       </button>
+      <div
+        id={`accordion-body-${index}`}
+        className={`${
+          expandedIndex === index ? "block" : "hidden"
+        } border border-teal-300 rounded-lg p-4`}
+      >
+        <InputField label="Project Name" name={`projects.${index}.name`} />
+        <InputField
+          label="Start Date"
+          name={`projects.${index}.startDate`}
+          type="date"
+        />
+        <InputField
+          label="End Date"
+          name={`projects.${index}.endDate`}
+          type="date"
+          disabled={isPresent}
+        />
+        <div className="flex items-center mb-4">
+          <Field
+            type="checkbox"
+            name={`projects.${index}.present`}
+            id={`projects.${index}.present`}
+            className="mr-2"
+            onChange={handlePresentChange}
+          />
+          <label className="py-2 text-green-400" htmlFor={`projects.${index}.present`}>Present</label>
+        </div>
+        <InputField label="Project Link" name={`projects.${index}.link`} />
+        <InputField
+          label="Skills Learned"
+          name={`projects.${index}.skillsLearned`}
+        />
+        <button
+          type="button"
+          onClick={() => arrayHelpers.remove(index)}
+          className="flex items-center py-2 px-4 mt-2 bg-red-500 text-white rounded-2xl hover:bg-red-600 focus:outline-none transition-colors duration-300"
+        >
+          <FiMinus className="w-5 h-5 mr-2" /> Remove
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
   const initialValues: MyFormValues = {
@@ -131,6 +158,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
         name: "",
         startDate: "",
         endDate: "",
+        present: false,
         link: "",
         skillsLearned: "",
       },
@@ -159,7 +187,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
             onNext();
           }}
         >
-          {({ handleReset, values }) => (
+          {({ handleReset, values, setFieldValue }) => (
             <Form>
               <FieldArray
                 name="projects"
@@ -173,6 +201,8 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
                         toggleAccordion={toggleAccordion}
                         project={project}
                         arrayHelpers={arrayHelpers}
+                        values={values}
+                        setFieldValue={setFieldValue}
                       />
                     ))}
                     <button
@@ -182,6 +212,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
                           name: "",
                           startDate: "",
                           endDate: "",
+                          present: false,
                           link: "",
                           skillsLearned: "",
                         })

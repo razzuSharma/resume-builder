@@ -1,25 +1,25 @@
 "use client";
 import React, { useState } from "react";
-import UserDetails from "../pages/UserDetails";
 import EducationDetails from "../pages/EducationDetails";
 import ExperienceDetails from "../pages/ExperienceDetails";
 import HobbiesDetails from "../pages/HobbiesDetails";
 import SkillsDetails from "../pages/SkillsDetails";
 import ProjectDetails from "../pages/ProjectDetails";
+import PersonalDetails from "../pages/PersonalDetails";
 
 const ResumePage = () => {
   const [activeTab, setActiveTab] = useState<
-    | "UserDetails"
+    | "PersonalDetails"
     | "EducationDetails"
     | "ExperienceDetails"
     | "HobbiesDetails"
     | "SkillsDetails"
     | "ProjectDetails"
-  >("UserDetails");
+  >("PersonalDetails");
 
   const handleTabClick = (
     tab:
-      | "UserDetails"
+      | "PersonalDetails"
       | "EducationDetails"
       | "ExperienceDetails"
       | "HobbiesDetails"
@@ -32,7 +32,7 @@ const ResumePage = () => {
   const handleFormSubmit = () => {
     // Move to the next tab after form submission
     switch (activeTab) {
-      case "UserDetails":
+      case "PersonalDetails":
         setActiveTab("EducationDetails");
         break;
       case "EducationDetails":
@@ -48,7 +48,7 @@ const ResumePage = () => {
         setActiveTab("ProjectDetails");
         break;
       case "ProjectDetails":
-        setActiveTab("UserDetails");
+        setActiveTab("PersonalDetails");
         break;
       // Add more cases if needed
       default:
@@ -64,7 +64,7 @@ const ResumePage = () => {
 
   // Tab contents
   const tabContent: { [key: string]: JSX.Element } = {
-    UserDetails: <UserDetails onNext={handleFormSubmit} />,
+    PersonalDetails: <PersonalDetails onNext={handleFormSubmit} />,
     EducationDetails: <EducationDetails onNext={handleFormSubmit} />,
     ExperienceDetails: <ExperienceDetails onNext={handleFormSubmit} />,
     HobbiesDetails: <HobbiesDetails onNext={handleFormSubmit} />,
@@ -83,7 +83,7 @@ const ResumePage = () => {
                 onClick={() =>
                   handleTabClick(
                     tab as
-                      | "UserDetails"
+                      | "PersonalDetails"
                       | "EducationDetails"
                       | "ExperienceDetails"
                       | "HobbiesDetails"
