@@ -1,8 +1,16 @@
 // EducationDetails.tsx
 import React, { useState } from "react";
-import { Formik, Form, FieldArray, Field, FieldProps, FormikHelpers } from "formik";
+import {
+  Formik,
+  Form,
+  FieldArray,
+  Field,
+  FieldProps,
+  FormikHelpers,
+} from "formik";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import ButtonStylings from "../components/Button";
+import { saveDataIntoSupabase } from "../utils/supabaseUtils";
 
 interface Education {
   schoolName: string;
@@ -52,7 +60,14 @@ const AccordionSection: React.FC<{
   education: Education;
   values: MyFormValues;
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
-}> = ({ index, expandedIndex, toggleAccordion, education, values, setFieldValue }) => {
+}> = ({
+  index,
+  expandedIndex,
+  toggleAccordion,
+  education,
+  values,
+  setFieldValue,
+}) => {
   const isPresent = values.educations[index].present;
 
   const handlePresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,10 +124,20 @@ const AccordionSection: React.FC<{
           expandedIndex === index ? "block" : "hidden"
         } border border-teal-300 rounded-lg p-4`}
       >
-        <InputField label="School Name" name={`educations.${index}.schoolName`} />
+        <InputField
+          label="School Name"
+          name={`educations.${index}.schoolName`}
+        />
         <InputField label="Degree" name={`educations.${index}.degree`} />
-        <InputField label="Field of Study" name={`educations.${index}.fieldOfStudy`} />
-        <InputField label="Start Date" name={`educations.${index}.startDate`} type="date" />
+        <InputField
+          label="Field of Study"
+          name={`educations.${index}.fieldOfStudy`}
+        />
+        <InputField
+          label="Start Date"
+          name={`educations.${index}.startDate`}
+          type="date"
+        />
         <InputField
           label="End Date"
           name={`educations.${index}.endDate`}
@@ -127,14 +152,21 @@ const AccordionSection: React.FC<{
             className="mr-2"
             onChange={handlePresentChange}
           />
-          <label className="text-green-600" htmlFor={`educations.${index}.present`}>Present</label>
+          <label
+            className="text-green-600"
+            htmlFor={`educations.${index}.present`}
+          >
+            Present
+          </label>
         </div>
       </div>
     </div>
   );
 };
 
-export const EducationDetails: React.FC<EducationDetailsProps> = ({ onNext }) => {
+export const EducationDetails: React.FC<EducationDetailsProps> = ({
+  onNext,
+}) => {
   const initialValues: MyFormValues = {
     educations: [
       {
@@ -163,10 +195,12 @@ export const EducationDetails: React.FC<EducationDetailsProps> = ({ onNext }) =>
       <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl shadow-teal-200 w-full max-w-md">
         <Formik
           initialValues={initialValues}
-          onSubmit={(values, actions) => {
+          onSubmit={async (values, actions) => {
             console.log({ values, actions });
             alert(JSON.stringify(values, null, 2));
             actions.setSubmitting(false);
+            await saveDataIntoSupabase("education_details", values.educations);
+
             onNext();
           }}
         >
@@ -176,17 +210,19 @@ export const EducationDetails: React.FC<EducationDetailsProps> = ({ onNext }) =>
                 name="educations"
                 render={(arrayHelpers) => (
                   <div>
-                    {values.educations.map((education: Education, index: number) => (
-                      <AccordionSection
-                        key={index}
-                        index={index}
-                        expandedIndex={expandedIndex}
-                        toggleAccordion={toggleAccordion}
-                        education={education}
-                        values={values}
-                        setFieldValue={setFieldValue}
-                      />
-                    ))}
+                    {values.educations.map(
+                      (education: Education, index: number) => (
+                        <AccordionSection
+                          key={index}
+                          index={index}
+                          expandedIndex={expandedIndex}
+                          toggleAccordion={toggleAccordion}
+                          education={education}
+                          values={values}
+                          setFieldValue={setFieldValue}
+                        />
+                      )
+                    )}
                     <button
                       type="button"
                       onClick={() =>

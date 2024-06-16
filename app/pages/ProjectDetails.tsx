@@ -6,6 +6,7 @@ import { FiPlus, FiMinus } from "react-icons/fi";
 import ButtonStylings from "../components/Button";
 import { useState } from "react";
 
+
 interface Project {
   name: string;
   startDate: string;
