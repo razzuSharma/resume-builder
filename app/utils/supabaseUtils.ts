@@ -11,7 +11,7 @@ export const saveDataIntoSupabase = async (tableName: string, data: any) => {
     }
 
     console.log("Data inserted successfully:", insertedData);
-    return insertedData; // Optional: Return the inserted data or ID
+    return data.ID; // Optional: Return the inserted data or ID
   } catch (error:any) {
     console.error("Error inserting data:", error.message);
     throw error;

@@ -1,14 +1,14 @@
-// ExperienceDetails.tsx
 import React, { useState } from "react";
 import { Formik, Form, FieldArray, Field } from "formik";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import ButtonStylings from "../components/Button";
+import { saveDataIntoSupabase } from "../utils/supabaseUtils";
 
 interface Experience {
   companyName: string;
   position: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   present: boolean;
   responsibilities: string[];
 }
@@ -52,13 +52,20 @@ const AccordionSection: React.FC<{
   experience: Experience;
   values: MyFormValues;
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
-}> = ({ index, expandedIndex, toggleAccordion, experience, values, setFieldValue }) => {
+}> = ({
+  index,
+  expandedIndex,
+  toggleAccordion,
+  experience,
+  values,
+  setFieldValue,
+}) => {
   const isPresent = values.experiences[index].present;
 
   const handlePresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFieldValue(`experiences.${index}.present`, e.target.checked);
     if (e.target.checked) {
-      setFieldValue(`experiences.${index}.endDate`, "");
+      setFieldValue(`experiences.${index}.endDate`, null); // Set endDate to null if present is checked
     }
   };
 
@@ -109,9 +116,16 @@ const AccordionSection: React.FC<{
           expandedIndex === index ? "block" : "hidden"
         } border border-teal-300 rounded-lg p-4`}
       >
-        <InputField label="Company Name" name={`experiences.${index}.companyName`} />
+        <InputField
+          label="Company Name"
+          name={`experiences.${index}.companyName`}
+        />
         <InputField label="Position" name={`experiences.${index}.position`} />
-        <InputField label="Start Date" name={`experiences.${index}.startDate`} type="date" />
+        <InputField
+          label="Start Date"
+          name={`experiences.${index}.startDate`}
+          type="date"
+        />
         <InputField
           label="End Date"
           name={`experiences.${index}.endDate`}
@@ -126,24 +140,47 @@ const AccordionSection: React.FC<{
             className="mr-2"
             onChange={handlePresentChange}
           />
-          <label className="py-2 text-green-600" htmlFor={`experiences.${index}.present`}>Present</label>
-        </div>
-        <div className="relative z-0 w-full mb-6 group">
           <label
-            htmlFor={`responsibility-${index}`}
-            className="peer-focus:font-medium absolute text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-teal-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            className="py-2 text-green-600"
+            htmlFor={`experiences.${index}.present`}
           >
-            Responsibilities
+            Present
           </label>
-          <Field
-            as="textarea"
-            name={`experiences.${index}.responsibilities`}
-            id={`responsibility-${index}`}
-            className="block py-2.5 px-0 w-full text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-teal-600 peer"
-            required
-            rows={3}
-          />
         </div>
+        <FieldArray
+          name={`experiences.${index}.responsibilities`}
+          render={(arrayHelpers) => (
+            <div>
+              <label className="peer-focus:font-medium text-gray-500">
+                Responsibilities
+              </label>
+              {values.experiences[index].responsibilities.map(
+                (responsibility, respIndex) => (
+                  <div key={respIndex} className="flex items-center mb-2">
+                    <Field
+                      name={`experiences.${index}.responsibilities.${respIndex}`}
+                      className="block py-2.5 px-0 w-full text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-teal-600"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => arrayHelpers.remove(respIndex)}
+                      className="ml-2 text-red-500"
+                    >
+                      <FiMinus />
+                    </button>
+                  </div>
+                )
+              )}
+              <button
+                type="button"
+                onClick={() => arrayHelpers.push("")}
+                className="flex items-center py-2 px-4 bg-teal-500 text-white rounded-2xl hover:bg-teal-600 focus:outline-none transition-colors duration-300"
+              >
+                <FiPlus className="w-5 h-5 mr-2" /> Add Responsibility
+              </button>
+            </div>
+          )}
+        />
       </div>
     </div>
   );
@@ -178,10 +215,21 @@ const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
       <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl shadow-teal-200 w-full max-w-md">
         <Formik
           initialValues={initialValues}
-          onSubmit={(values, actions) => {
-            console.log({ values, actions });
-            alert(JSON.stringify(values, null, 2));
+          onSubmit={async (values, actions) => {
+            // Adjust endDate for entries with present set to true
+            const adjustedValues = {
+              ...values,
+              experiences: values.experiences.map((exp) =>
+                exp.present ? { ...exp, endDate: null } : exp
+              ),
+            };
+
+            console.log({ values: adjustedValues, actions });
             actions.setSubmitting(false);
+            await saveDataIntoSupabase(
+              "experience_details",
+              adjustedValues.experiences
+            );
             onNext();
           }}
         >
