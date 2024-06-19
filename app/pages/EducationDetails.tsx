@@ -17,7 +17,7 @@ interface Education {
   degree: string;
   fieldOfStudy: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   present: boolean;
 }
 
@@ -73,7 +73,7 @@ const AccordionSection: React.FC<{
   const handlePresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFieldValue(`educations.${index}.present`, e.target.checked);
     if (e.target.checked) {
-      setFieldValue(`educations.${index}.endDate`, "");
+      setFieldValue(`educations.${index}.endDate`, null);
     }
   };
 
@@ -196,10 +196,20 @@ export const EducationDetails: React.FC<EducationDetailsProps> = ({
         <Formik
           initialValues={initialValues}
           onSubmit={async (values, actions) => {
-            console.log({ values, actions });
+            const adjustedValues = {
+              ...values,
+              experiences: values.educations.map((exp) =>
+                exp.present ? { ...exp, endDate: null } : exp
+              ),
+            };
+
+            console.log({ values: adjustedValues, actions });
             alert(JSON.stringify(values, null, 2));
             actions.setSubmitting(false);
-            await saveDataIntoSupabase("education_details", values.educations);
+            await saveDataIntoSupabase(
+              "education_details",
+              adjustedValues.educations
+            );
 
             onNext();
           }}
