@@ -4,7 +4,7 @@ import * as React from "react";
 import { Formik, Form, FieldArray, Field } from "formik";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import ButtonStylings from "../components/Button";
-import { useState } from "react";
+import { saveDataIntoSupabase } from "../utils/supabaseUtils";
 
 interface Skill {
   name: string;
@@ -15,7 +15,7 @@ interface SkillsDetailsProps {
 }
 
 interface MyFormValues {
-  skills: Skill[];
+  skills: string[];
 }
 
 const InputField: React.FC<{
@@ -40,84 +40,9 @@ const InputField: React.FC<{
   </div>
 );
 
-const AccordionSection: React.FC<{
-  index: number;
-  expandedIndex: number | null;
-  toggleAccordion: (index: number) => void;
-  skill: Skill;
-  arrayHelpers: any;
-}> = ({ index, expandedIndex, toggleAccordion, skill, arrayHelpers }) => (
-  <div className="mb-4">
-    <button
-      type="button"
-      className="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-teal-500 border border-b-0 border-teal-200 rounded-t-xl dark:border-teal-700 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-800 gap-3"
-      onClick={() => toggleAccordion(index)}
-      aria-expanded={expandedIndex === index ? "true" : "false"}
-      aria-controls={`accordion-body-${index}`}
-    >
-      <span className="flex items-center">
-        <FiPlus
-          className={`w-5 h-5 me-2 ${
-            expandedIndex === index ? "hidden" : "block"
-          }`}
-        />
-        <FiMinus
-          className={`w-5 h-5 me-2 ${
-            expandedIndex === index ? "block" : "hidden"
-          }`}
-        />
-        Skill {index + 1}
-      </span>
-      <svg
-        data-accordion-icon
-        className={`w-3 h-3 rotate-${
-          expandedIndex === index ? "180" : "0"
-        } shrink-0`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 6"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M9 5 5 1 1 5"
-        />
-      </svg>
-    </button>
-    <div
-      id={`accordion-body-${index}`}
-      className={`${
-        expandedIndex === index ? "block" : "hidden"
-      } border border-teal-300 rounded-lg p-4`}
-    >
-      <InputField label="Skill Name" name={`skills.${index}.name`} />
-      <button
-        type="button"
-        onClick={() => arrayHelpers.remove(index)}
-        className="flex items-center py-2 px-4 mt-2 bg-red-500 text-white rounded-2xl hover:bg-red-600 focus:outline-none transition-colors duration-300"
-      >
-        <FiMinus className="w-5 h-5 mr-2" /> Remove
-      </button>
-    </div>
-  </div>
-);
-
 const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
   const initialValues: MyFormValues = {
-    skills: [{ name: "" }],
-  };
-
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
-
-  const toggleAccordion = (index: number) => {
-    if (expandedIndex === index) {
-      setExpandedIndex(null); // Collapse if clicking on the same section
-    } else {
-      setExpandedIndex(index); // Expand the clicked section
-    }
+    skills: [""],
   };
 
   return (
@@ -125,39 +50,79 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
       <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl shadow-teal-200 w-full max-w-md">
         <Formik
           initialValues={initialValues}
-          onSubmit={(values, actions) => {
+          onSubmit={async (values, actions) => {
             console.log({ values, actions });
             alert(JSON.stringify(values, null, 2));
             actions.setSubmitting(false);
+            await saveDataIntoSupabase("skills", values);
             onNext();
           }}
         >
           {({ handleReset, values }) => (
             <Form>
-              <FieldArray
-                name="skills"
-                render={(arrayHelpers) => (
-                  <div>
-                    {values.skills.map((skill, index) => (
-                      <AccordionSection
-                        key={index}
-                        index={index}
-                        expandedIndex={expandedIndex}
-                        toggleAccordion={toggleAccordion}
-                        skill={skill}
-                        arrayHelpers={arrayHelpers}
-                      />
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => arrayHelpers.push({ name: "" })}
-                      className="flex items-center py-2 px-4 bg-teal-500 text-white rounded-2xl hover:bg-teal-600 focus:outline-none transition-colors duration-300"
-                    >
-                      <FiPlus className="w-5 h-5 mr-2" /> Add More
-                    </button>
-                  </div>
-                )}
-              />
+              <div className="mb-4">
+                <button
+                  type="button"
+                  className="flex items-center justify-between w-full p-5 font-medium rtl:text-right text-teal-500 border border-b-0 border-teal-200 rounded-t-xl dark:border-teal-700 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-800 gap-3"
+                  aria-expanded="true"
+                  aria-controls="accordion-body-0"
+                >
+                  <span className="flex items-center">
+                    <FiMinus className="w-5 h-5 me-2 block" />
+                    Skills
+                  </span>
+                  <svg
+                    data-accordion-icon
+                    className="w-3 h-3 rotate-180 shrink-0"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 5 5 1 1 5"
+                    />
+                  </svg>
+                </button>
+                <div
+                  id="accordion-body-0"
+                  className="border border-teal-300 rounded-lg p-4"
+                >
+                  <FieldArray
+                    name="skills"
+                    render={(arrayHelpers) => (
+                      <div>
+                        {values.skills.map((skill, index) => (
+                          <div key={index} className="flex items-center mb-2">
+                            <InputField
+                              label={`Skill ${index + 1}`}
+                              name={`skills.${index}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => arrayHelpers.remove(index)}
+                              className="ml-2 text-red-500"
+                            >
+                              <FiMinus />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => arrayHelpers.push("")}
+                          className="flex items-center py-2 px-4 bg-teal-500 text-white rounded-2xl hover:bg-teal-600 focus:outline-none transition-colors duration-300"
+                        >
+                          <FiPlus className="w-5 h-5 mr-2" /> Add Skill
+                        </button>
+                      </div>
+                    )}
+                  />
+                </div>
+              </div>
               <div className="flex justify-end mt-6 gap-3">
                 <ButtonStylings
                   variant="teal"
