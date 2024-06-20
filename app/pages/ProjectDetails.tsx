@@ -5,15 +5,15 @@ import { Formik, Form, FieldArray, Field } from "formik";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import ButtonStylings from "../components/Button";
 import { useState } from "react";
-
+import { saveDataIntoSupabase } from "../utils/supabaseUtils";
 
 interface Project {
   name: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   present: boolean;
   link: string;
-  skillsLearned: string;
+  skillsLearned: string[];
 }
 
 interface ProjectDetailsProps {
@@ -56,7 +56,15 @@ const AccordionSection: React.FC<{
   arrayHelpers: any;
   values: MyFormValues;
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
-}> = ({ index, expandedIndex, toggleAccordion, project, arrayHelpers, values, setFieldValue }) => {
+}> = ({
+  index,
+  expandedIndex,
+  toggleAccordion,
+  project,
+  arrayHelpers,
+  values,
+  setFieldValue,
+}) => {
   const isPresent = values.projects[index].present;
 
   const handlePresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,12 +141,42 @@ const AccordionSection: React.FC<{
             className="mr-2"
             onChange={handlePresentChange}
           />
-          <label className="py-2 text-green-400" htmlFor={`projects.${index}.present`}>Present</label>
+          <label
+            className="py-2 text-green-400"
+            htmlFor={`projects.${index}.present`}
+          >
+            Present
+          </label>
         </div>
         <InputField label="Project Link" name={`projects.${index}.link`} />
-        <InputField
-          label="Skills Learned"
+        <FieldArray
           name={`projects.${index}.skillsLearned`}
+          render={(arrayHelpersSkills) => (
+            <div>
+              {project.skillsLearned.map((skill, skillIndex) => (
+                <div key={skillIndex} className="flex items-center mb-2">
+                  <InputField
+                    label={`Skill ${skillIndex + 1}`}
+                    name={`projects.${index}.skillsLearned.${skillIndex}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => arrayHelpersSkills.remove(skillIndex)}
+                    className="ml-2 text-red-500"
+                  >
+                    <FiMinus />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => arrayHelpersSkills.push("")}
+                className="flex items-center py-2 px-4 bg-teal-500 text-white rounded-2xl hover:bg-teal-600 focus:outline-none transition-colors duration-300"
+              >
+                <FiPlus className="w-5 h-5 mr-2" /> Add Skill
+              </button>
+            </div>
+          )}
         />
         <button
           type="button"
@@ -161,7 +199,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
         endDate: "",
         present: false,
         link: "",
-        skillsLearned: "",
+        skillsLearned: [""],
       },
     ],
   };
@@ -181,11 +219,17 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
       <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl shadow-teal-200 w-full max-w-md">
         <Formik
           initialValues={initialValues}
-          onSubmit={(values, actions) => {
+          onSubmit={async (values, actions) => {
             console.log({ values, actions });
-            alert(JSON.stringify(values, null, 2));
+            try {
+              await saveDataIntoSupabase('project_details',values.projects); // Save data into Supabase
+              alert("Data saved successfully!");
+              onNext();
+            } catch (error) {
+              console.error("Error saving data: ", error);
+              alert("Failed to save data");
+            }
             actions.setSubmitting(false);
-            onNext();
           }}
         >
           {({ handleReset, values, setFieldValue }) => (
@@ -215,7 +259,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
                           endDate: "",
                           present: false,
                           link: "",
-                          skillsLearned: "",
+                          skillsLearned: [""],
                         })
                       }
                       className="flex items-center py-2 px-4 bg-teal-500 text-white rounded-2xl hover:bg-teal-600 focus:outline-none transition-colors duration-300"
@@ -234,7 +278,6 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
                 >
                   Clear
                 </ButtonStylings>
-
                 <ButtonStylings variant="purple" onClick={() => {}}>
                   Next
                 </ButtonStylings>
