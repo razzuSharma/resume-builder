@@ -52,7 +52,6 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
         <Formik
           initialValues={initialValues}
           onSubmit={async (values, actions) => {
-            // console.log({ values, actions });
             alert(JSON.stringify(values, null, 2));
             actions.setSubmitting(false);
             await saveDataIntoSupabase("personal_details", values);
