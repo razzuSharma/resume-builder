@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import ButtonStylings from "../components/Button";
-// import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { saveDataIntoSupabase } from "../utils/supabaseUtils";
 interface UserDetailsProps {

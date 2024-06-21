@@ -30,7 +30,6 @@ const ResumePage = () => {
   };
 
   const handleFormSubmit = () => {
-    // Move to the next tab after form submission
     switch (activeTab) {
       case "PersonalDetails":
         setActiveTab("EducationDetails");
@@ -50,7 +49,6 @@ const ResumePage = () => {
       case "ProjectDetails":
         setActiveTab("PersonalDetails");
         break;
-      // Add more cases if needed
       default:
         break;
     }
@@ -66,10 +64,10 @@ const ResumePage = () => {
   const tabContent: { [key: string]: JSX.Element } = {
     PersonalDetails: <PersonalDetails onNext={handleFormSubmit} />,
     EducationDetails: <EducationDetails onNext={handleFormSubmit} />,
+    ProjectDetails: <ProjectDetails onNext={handleFormSubmit} />,
     ExperienceDetails: <ExperienceDetails onNext={handleFormSubmit} />,
     HobbiesDetails: <HobbiesDetails onNext={handleFormSubmit} />,
     SkillsDetails: <SkillsDetails onNext={handleFormSubmit} />,
-    ProjectDetails: <ProjectDetails onNext={handleFormSubmit} />,
   };
 
   return (
