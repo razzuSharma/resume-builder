@@ -1,39 +1,56 @@
-import React from "react";
-import { useState, useEffect } from "react";
+'use client'
+import React, { useState, useEffect } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-const ResumePage: React.FC = async () => {
+const ResumePage: React.FC = () => {
   const supabaseGetData = createClientComponentClient();
-  try {
-    const { data: displayedData, error } = await supabaseGetData
-      .from("personal_details")
-      .select("*");
-    if (error) {
-      throw new Error(`Error inserting data: ${error.message}`);
-    }
-    console.log("Data displayed successfully:", displayedData);
-  } catch (error: any) {
-    console.error("Error inserting data:", error.message);
-    throw error;
+  const [personalData, setPersonalData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: personal_details_data, error } = await supabaseGetData
+          .from("personal_details")
+          .select("*");
+        if (error) {
+          throw new Error(`Error fetching data: ${error.message}`);
+        }
+        console.log("Data displayed successfully:", personal_details_data);
+        setPersonalData(personal_details_data);
+      } catch (error: any) {
+        console.error("Error fetching data:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [supabaseGetData]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
+
   return (
     <div className="p-8 max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
       <h1 className="text-4xl font-bold text-center mb-8">Resume</h1>
 
       {/* Personal Details Section */}
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4 text-ce">
-          Personal Details
-        </h2>
-        <p>
-          <strong>Name:</strong> John Doe
-        </p>
-        <p>
-          <strong>Email:</strong> john.doe@example.com
-        </p>
-        <p>
-          <strong>Phone:</strong> (123) 456-7890
-        </p>
+        <h2 className="text-2xl font-semibold mb-4">Personal Details</h2>
+        {personalData.map((data, index) => (
+          <div key={index}>
+            <p>
+              <strong>Name:</strong> {data.firstName} {data.lastName}
+            </p>
+            <p>
+              <strong>Email:</strong> {data.email}
+            </p>
+            <p>
+              <strong>Phone:</strong> {data.phone}
+            </p>
+          </div>
+        ))}
       </section>
       <hr className="border-t-2 border-gray-300 my-8" />
 

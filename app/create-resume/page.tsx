@@ -75,6 +75,9 @@ const ResumePage = () => {
       <div className="flex">
         <div className="w-1/4 flex items-center justify-center">
           <nav className="flex flex-col space-y-2">
+            <h1>
+              You are loged in as: 
+            </h1>
             {Object.keys(tabContent).map((tab, index) => (
               <button
                 key={index}
