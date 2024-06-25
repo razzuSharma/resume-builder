@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import EducationDetails from "../pages/EducationDetails";
 import ExperienceDetails from "../pages/ExperienceDetails";
 import HobbiesDetails from "../pages/HobbiesDetails";
@@ -75,9 +75,6 @@ const ResumePage = () => {
       <div className="flex">
         <div className="w-1/4 flex items-center justify-center">
           <nav className="flex flex-col space-y-2">
-            <h1>
-              You are loged in as: 
-            </h1>
             {Object.keys(tabContent).map((tab, index) => (
               <button
                 key={index}

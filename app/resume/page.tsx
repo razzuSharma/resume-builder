@@ -144,29 +144,19 @@ const ResumePage: React.FC = () => {
       <hr className="border-t-2 border-gray-300 my-8" />
       {/* Hobbies Section */}
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Projects</h2>
-        {project_details.length > 0 ? (
-          project_details.map((data: any, index: number) => (
-            <div key={index}>
-              <h3 className="text-xl font-semibold">{data.projectName}</h3>
-              <p>
-                {data.startDate} - {data.endDate}
-              </p>
-              <p>
-                Link:{" "}
-                <a
-                  href={data.projectLink}
-                  className="text-teal-500 hover:underline"
-                >
-                  Project Link
-                </a>
-              </p>
-              <p>Skills Learned: {data.skillsLearned}</p>
-            </div>
-          ))
-        ) : (
-          <div></div>
-        )}
+        <h2 className="text-2xl font-semibold mb-4">Hobbies</h2>
+        <ul className="list-disc ml-5">
+          {hobbies.length > 0 ? (
+            hobbies.map((hobby: any, index: number) => {
+              const hobbiesArray = JSON.parse(hobby.hobbies);
+              return hobbiesArray.map((hobbyItem: string, i: number) => (
+                <li key={`${index}-${i}`}>{hobbyItem}</li>
+              ));
+            })
+          ) : (
+            <div>No hobbies found.</div>
+          )}
+        </ul>
       </section>
     </div>
   );
