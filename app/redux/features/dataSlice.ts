@@ -5,7 +5,7 @@ import fetchDataFromTables from "../../utils/fetchDataFromTables";
 // Define a type for the slice state
 interface DataState {
   personal_details: any[];
-  educational_details: any[];
+  education_details: any[];
   experience_details: any[];
   skills: any[];
   project_details: any[];
@@ -17,7 +17,7 @@ interface DataState {
 
 const initialState: DataState = {
   personal_details: [],
-  educational_details: [],
+  education_details: [],
   experience_details: [],
   skills: [],
   project_details: [],

@@ -7,7 +7,7 @@ const ResumePage: React.FC = () => {
   const dispatch = useAppDispatch();
   const {
     personal_details,
-    educational_details,
+    education_details,
     experience_details,
     skills,
     project_details,
@@ -20,7 +20,6 @@ const ResumePage: React.FC = () => {
       console.log("Data returned:", data);
     });
   }, [dispatch]);
-
 
   if (loading) {
     return <div>Loading...</div>;
@@ -57,12 +56,13 @@ const ResumePage: React.FC = () => {
       <hr className="border-t-2 border-gray-300 my-8" />
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Education</h2>
-        {educational_details.length > 0 ? (
-          educational_details.map((data: any, index: number) => (
+        {education_details.length > 0 ? (
+          education_details.map((data: any, index: number) => (
             <div key={index}>
               <h3 className="text-xl font-semibold">{data.degree}</h3>
               <p>
-                {data.institution}, {data.startYear} - {data.endYear}
+                {data.fieldOfStudy}, {data.startDate} -{" "}
+                {data.present ? "Present" : data.endDate}
               </p>
             </div>
           ))
@@ -70,6 +70,7 @@ const ResumePage: React.FC = () => {
           <div></div>
         )}
       </section>
+
       <hr className="border-t-2 border-gray-300 my-8" />
       {/* Experience Section */}
       <section className="mb-8">
@@ -93,18 +94,24 @@ const ResumePage: React.FC = () => {
             </div>
           ))
         ) : (
-          <div>No experience details found.</div>
+          <div></div>
         )}
       </section>
       <hr className="border-t-2 border-gray-300 my-8" />
       {/* Skills Section */}
-      {/* Skills Section */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Skills</h2>
         <ul className="list-disc ml-5">
-          {skills.map((skill, index) => (
-            <li key={index}>{skill.skills}</li> // Assuming skillName is the property you want to render
-          ))}
+          {skills.length > 0 ? (
+            skills.map((skill: any, index: number) => {
+              const skillsArray = JSON.parse(skill.skills);
+              return skillsArray.map((sk: string, i: number) => (
+                <li key={`${index}-${i}`}>{sk}</li>
+              ));
+            })
+          ) : (
+            <div></div>
+          )}
         </ul>
       </section>
       <hr className="border-t-2 border-gray-300 my-8" />
@@ -131,22 +138,35 @@ const ResumePage: React.FC = () => {
             </div>
           ))
         ) : (
-          <div>No project_details found.</div>
+          <div></div>
         )}
       </section>
       <hr className="border-t-2 border-gray-300 my-8" />
       {/* Hobbies Section */}
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Hobbies</h2>
-        <ul className="list-disc ml-5">
-          {hobbies.length > 0 ? (
-            hobbies.map((hobby, index) => (
-              <li key={index}>{hobby.hobbies}</li>
-            ))
-          ) : (
-            <div></div>
-          )}
-        </ul>
+        <h2 className="text-2xl font-semibold mb-4">Projects</h2>
+        {project_details.length > 0 ? (
+          project_details.map((data: any, index: number) => (
+            <div key={index}>
+              <h3 className="text-xl font-semibold">{data.projectName}</h3>
+              <p>
+                {data.startDate} - {data.endDate}
+              </p>
+              <p>
+                Link:{" "}
+                <a
+                  href={data.projectLink}
+                  className="text-teal-500 hover:underline"
+                >
+                  Project Link
+                </a>
+              </p>
+              <p>Skills Learned: {data.skillsLearned}</p>
+            </div>
+          ))
+        ) : (
+          <div></div>
+        )}
       </section>
     </div>
   );
