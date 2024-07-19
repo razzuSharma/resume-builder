@@ -1,7 +1,8 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchAllData } from "../redux/features/dataSlice";
+import { useReactToPrint } from "react-to-print";
 
 const ResumePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,6 +22,13 @@ const ResumePage: React.FC = () => {
     });
   }, [dispatch]);
 
+  const contentToPrint = useRef(null);
+  const handlePrint = useReactToPrint({
+    documentTitle: "Print This Document",
+    onBeforePrint: () => console.log("before printing..."),
+    onAfterPrint: () => console.log("after printing..."),
+    removeAfterPrint: true,
+  });
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -30,7 +38,11 @@ const ResumePage: React.FC = () => {
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
+    <div
+      className="p-8 max-w-4xl mx-auto bg-white rounded-xl shadow-lg"
+      ref={contentToPrint}
+    >
+     
       <h1 className="text-4xl font-bold text-center mb-8">Resume</h1>
       {/* Personal Details Section */}
       <section className="mb-8">
@@ -158,6 +170,13 @@ const ResumePage: React.FC = () => {
           )}
         </ul>
       </section>
+      <button
+        onClick={() => {
+          handlePrint(null, () => contentToPrint.current);
+        }}
+      >
+        PRINT
+      </button>
     </div>
   );
 };
