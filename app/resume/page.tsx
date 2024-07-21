@@ -44,7 +44,6 @@ const ResumePage: React.FC = () => {
     >
      
       <h1 className="text-4xl font-bold text-center mb-8">Resume</h1>
-      {/* Personal Details Section */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Personal Details</h2>
         {personal_details.length > 0 ? (
@@ -84,7 +83,6 @@ const ResumePage: React.FC = () => {
       </section>
 
       <hr className="border-t-2 border-gray-300 my-8" />
-      {/* Experience Section */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Experience</h2>
         {experience_details.length > 0 ? (
@@ -110,7 +108,6 @@ const ResumePage: React.FC = () => {
         )}
       </section>
       <hr className="border-t-2 border-gray-300 my-8" />
-      {/* Skills Section */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Skills</h2>
         <ul className="list-disc ml-5">
@@ -127,7 +124,6 @@ const ResumePage: React.FC = () => {
         </ul>
       </section>
       <hr className="border-t-2 border-gray-300 my-8" />
-      {/* Projects Section */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Projects</h2>
         {project_details.length > 0 ? (
@@ -154,7 +150,6 @@ const ResumePage: React.FC = () => {
         )}
       </section>
       <hr className="border-t-2 border-gray-300 my-8" />
-      {/* Hobbies Section */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Hobbies</h2>
         <ul className="list-disc ml-5">

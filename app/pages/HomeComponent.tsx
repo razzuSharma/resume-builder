@@ -5,12 +5,12 @@ import DynamicLink from "../components/Button";
 import { roboto_mono } from "../fonts";
 
 const HomeComponent = () => {
-  const imageLink = "/okay-bg.jpg";
+  const imageLink = "/background.png";
   const downArrow = "/down-arrow.png";
 
   return (
     <section className="flex justify-center items-center h-screen">
-      <div className="container grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="container grid grid-cols-1 md:grid-cols-2 gap-32">
         <div className="flex flex-col justify-center items-center md:items-start relative">
           <h1
             className={`${roboto_mono.className} text-6xl md:text-5xl font-bold mb-4 text-teal-600`}
@@ -47,14 +47,13 @@ const HomeComponent = () => {
           </div>
         </div>
 
-        <div className="text-center md:text-right rounded-full overflow-hidden">
-          <div className="mt-5">
+        <div className="flex flex-col min-h-full">
+          <div className="mt-10 ">
             <Image
               src={imageLink}
               alt="image"
-              height={800}
-              width={800}
-              className="rounded-full ml-20"
+              height={500}
+              width={500}
             />
           </div>
         </div>
