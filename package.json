@@ -35,9 +35,11 @@
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.6",
     "typescript": "5.2.2",
+    "uuid": "^10.0.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {
-    "@types/react-redux": "^7.1.33"
+    "@types/react-redux": "^7.1.33",
+    "@types/uuid": "^10.0.0"
   }
 }

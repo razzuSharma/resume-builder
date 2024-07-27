@@ -22,6 +22,7 @@ interface ProjectDetailsProps {
 
 interface MyFormValues {
   projects: Project[];
+  user_id?: string;
 }
 
 const InputField: React.FC<{
@@ -191,6 +192,14 @@ const AccordionSection: React.FC<{
 };
 
 const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
+  const [userId, setUserId] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
   const initialValues: MyFormValues = {
     projects: [
       {
@@ -202,6 +211,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
         skillsLearned: [""],
       },
     ],
+    user_id: userId || "",
   };
 
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
@@ -213,25 +223,27 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
       setExpandedIndex(index); // Expand the clicked section
     }
   };
+  const handleSubmit = async (values: MyFormValues, actions: any) => {
+    const adjustedValues = values.projects.map((project) => ({
+      ...project,
+      user_id: userId,
+    }));
+    console.log({ values: adjustedValues, actions });
+    try {
+      await saveDataIntoSupabase("project_details", adjustedValues);
+      alert("Data saved successfully!");
+      onNext();
+    } catch (error) {
+      console.error("Error saving data: ", error);
+      alert("Failed to save data");
+    }
+    actions.setSubmitting(false);
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen overflow-hidden p-4">
       <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl shadow-teal-200 w-full max-w-md">
-        <Formik
-          initialValues={initialValues}
-          onSubmit={async (values, actions) => {
-            console.log({ values, actions });
-            try {
-              await saveDataIntoSupabase('project_details',values.projects); // Save data into Supabase
-              alert("Data saved successfully!");
-              onNext();
-            } catch (error) {
-              console.error("Error saving data: ", error);
-              alert("Failed to save data");
-            }
-            actions.setSubmitting(false);
-          }}
-        >
+        <Formik initialValues={initialValues} onSubmit={handleSubmit}>
           {({ handleReset, values, setFieldValue }) => (
             <Form>
               <FieldArray

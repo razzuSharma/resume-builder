@@ -4,7 +4,7 @@ export const saveDataIntoSupabase = async (tableName: string, data: any) => {
   try {
     const { data: insertedData, error } = await supabase
       .from(tableName)
-      .insert(data);
+      .upsert(data);
 
     if (error) {
       throw new Error(`Error inserting data: ${error.message}`);
