@@ -1,11 +1,6 @@
-// EducationDetails.tsx
-import React, { useState } from "react";
-import {
-  Formik,
-  Form,
-  FieldArray,
-  Field,
-} from "formik";
+'use client';
+import React, { useState, useEffect } from "react";
+import { Formik, Form, FieldArray, Field } from "formik";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import ButtonStylings from "../components/Button";
 import { saveDataIntoSupabase } from "../utils/supabaseUtils";
@@ -25,6 +20,7 @@ interface EducationDetailsProps {
 
 interface MyFormValues {
   educations: Education[];
+  user_id?: string;
 }
 
 const InputField: React.FC<{
@@ -165,6 +161,15 @@ const AccordionSection: React.FC<{
 export const EducationDetails: React.FC<EducationDetailsProps> = ({
   onNext,
 }) => {
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
+
   const initialValues: MyFormValues = {
     educations: [
       {
@@ -176,6 +181,7 @@ export const EducationDetails: React.FC<EducationDetailsProps> = ({
         present: false,
       },
     ],
+    user_id: userId || "",
   };
 
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
@@ -187,30 +193,27 @@ export const EducationDetails: React.FC<EducationDetailsProps> = ({
       setExpandedIndex(index); // Expand the clicked section
     }
   };
+  const handleSubmit = async (values: MyFormValues, actions: any) => {
+    const adjustedValues = values.educations.map((education) => ({
+      ...education,
+      user_id: userId,
+    }));
+
+    console.log({ values: adjustedValues, actions });
+    alert(JSON.stringify(values, null, 2));
+    actions.setSubmitting(false);
+
+    await saveDataIntoSupabase("education_details", adjustedValues);
+
+    onNext();
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen overflow-hidden p-4">
       <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl shadow-teal-200 w-full max-w-md">
         <Formik
           initialValues={initialValues}
-          onSubmit={async (values, actions) => {
-            const adjustedValues = {
-              ...values,
-              experiences: values.educations.map((exp) =>
-                exp.present ? { ...exp, endDate: null } : exp
-              ),
-            };
-
-            console.log({ values: adjustedValues, actions });
-            alert(JSON.stringify(values, null, 2));
-            actions.setSubmitting(false);
-            await saveDataIntoSupabase(
-              "education_details",
-              adjustedValues.educations
-            );
-
-            onNext();
-          }}
+          onSubmit={handleSubmit}
         >
           {({ handleReset, values, setFieldValue }) => (
             <Form>

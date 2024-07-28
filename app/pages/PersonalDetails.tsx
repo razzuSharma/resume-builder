@@ -3,16 +3,18 @@
 import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import ButtonStylings from "../components/Button";
-
 import { saveDataIntoSupabase } from "../utils/supabaseUtils";
+import { v4 as uuidv4 } from 'uuid';
 interface UserDetailsProps {
   onNext: () => void;
 }
+
 export interface MyFormValues {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
+  user_id?: string; // Optional user_id field
 }
 
 const InputField: React.FC<{
@@ -38,11 +40,19 @@ const InputField: React.FC<{
 );
 
 const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
+  // Generate or retrieve user ID from localStorage
+  let userId = localStorage.getItem("user_id");
+  if (!userId) {
+    userId = uuidv4();
+    localStorage.setItem("user_id", userId);
+  }
+
   const initialValues: MyFormValues = {
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
+    user_id: userId, // Include user_id in initial values
   };
 
   return (
@@ -51,6 +61,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
         <Formik
           initialValues={initialValues}
           onSubmit={async (values, actions) => {
+            values.user_id = userId;
+
             alert(JSON.stringify(values, null, 2));
             actions.setSubmitting(false);
             await saveDataIntoSupabase("personal_details", values);
@@ -72,7 +84,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ onNext }) => {
                 >
                   Clear
                 </ButtonStylings>
-                <ButtonStylings variant="purple" onClick={() => {}}>
+                <ButtonStylings variant="purple" onClick={()=>{}}>
                   Next
                 </ButtonStylings>
               </div>
