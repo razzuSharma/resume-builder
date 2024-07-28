@@ -71,7 +71,7 @@ const AccordionSection: React.FC<{
   const handlePresentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFieldValue(`projects.${index}.present`, e.target.checked);
     if (e.target.checked) {
-      setFieldValue(`projects.${index}.endDate`, "");
+      setFieldValue(`projects.${index}.endDate`, null);
     }
   };
 
