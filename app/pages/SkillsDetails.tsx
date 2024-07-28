@@ -1,6 +1,6 @@
-// SkillsDetails.tsx
 "use client";
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { Formik, Form, FieldArray, Field } from "formik";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import ButtonStylings from "../components/Button";
@@ -16,6 +16,7 @@ interface SkillsDetailsProps {
 
 interface MyFormValues {
   skills: string[];
+  user_id?: string;
 }
 
 const InputField: React.FC<{
@@ -41,8 +42,18 @@ const InputField: React.FC<{
 );
 
 const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
+
   const initialValues: MyFormValues = {
     skills: [""],
+    user_id: userId || "",
   };
 
   return (
@@ -51,10 +62,14 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
         <Formik
           initialValues={initialValues}
           onSubmit={async (values, actions) => {
-            console.log({ values, actions });
-            alert(JSON.stringify(values, null, 2));
+            const adjustedValues = {
+              ...values,
+              user_id: userId,
+            };
+            console.log({ values: adjustedValues, actions });
+            alert(JSON.stringify(adjustedValues, null, 2));
             actions.setSubmitting(false);
-            await saveDataIntoSupabase("skills", values);
+            await saveDataIntoSupabase("skills", adjustedValues);
             onNext();
           }}
         >

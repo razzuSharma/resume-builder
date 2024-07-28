@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+'use client'
+
+import React, { useState, useEffect } from "react";
 import { Formik, Form, FieldArray, Field } from "formik";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import ButtonStylings from "../components/Button";
@@ -19,6 +21,7 @@ interface ExperienceDetailsProps {
 
 interface MyFormValues {
   experiences: Experience[];
+  user_id?: string;
 }
 
 const InputField: React.FC<{
@@ -187,6 +190,15 @@ const AccordionSection: React.FC<{
 };
 
 const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
+
   const initialValues: MyFormValues = {
     experiences: [
       {
@@ -198,6 +210,7 @@ const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
         responsibilities: [],
       },
     ],
+    user_id: userId || "",
   };
 
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
@@ -210,29 +223,27 @@ const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
     }
   };
 
+  const handleSubmit = async (values: MyFormValues, actions: any) => {
+    const adjustedValues = values.experiences.map((experience) => ({
+      ...experience,
+      user_id: userId,
+    }));
+    console.log({ values: adjustedValues, actions });
+    try {
+      await saveDataIntoSupabase("experience_details", adjustedValues);
+      alert("Data saved successfully!");
+      onNext();
+    } catch (error) {
+      console.error("Error saving data: ", error);
+      alert("Failed to save data");
+    }
+    actions.setSubmitting(false);
+  };
+
   return (
     <div className="flex justify-center items-center min-h-screen overflow-hidden p-4">
       <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl shadow-teal-200 w-full max-w-md">
-        <Formik
-          initialValues={initialValues}
-          onSubmit={async (values, actions) => {
-            // Adjust endDate for entries with present set to true
-            const adjustedValues = {
-              ...values,
-              experiences: values.experiences.map((exp) =>
-                exp.present ? { ...exp, endDate: null } : exp
-              ),
-            };
-
-            console.log({ values: adjustedValues, actions });
-            actions.setSubmitting(false);
-            await saveDataIntoSupabase(
-              "experience_details",
-              adjustedValues.experiences
-            );
-            onNext();
-          }}
-        >
+        <Formik initialValues={initialValues} onSubmit={handleSubmit}>
           {({ handleReset, values, setFieldValue }) => (
             <Form>
               <FieldArray
