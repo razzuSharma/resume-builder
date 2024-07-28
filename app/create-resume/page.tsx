@@ -22,9 +22,9 @@ const ResumePage = () => {
       | "PersonalDetails"
       | "EducationDetails"
       | "ExperienceDetails"
+      | "ProjectDetails"
       | "HobbiesDetails"
       | "SkillsDetails"
-      | "ProjectDetails"
   ) => {
     setActiveTab(tab);
   };
@@ -38,15 +38,15 @@ const ResumePage = () => {
         setActiveTab("ExperienceDetails");
         break;
       case "ExperienceDetails":
+        setActiveTab("ProjectDetails");
+        break;
+      case "ProjectDetails":
         setActiveTab("HobbiesDetails");
         break;
       case "HobbiesDetails":
         setActiveTab("SkillsDetails");
         break;
       case "SkillsDetails":
-        setActiveTab("ProjectDetails");
-        break;
-      case "ProjectDetails":
         setActiveTab("PersonalDetails");
         break;
       default:
@@ -64,8 +64,8 @@ const ResumePage = () => {
   const tabContent: { [key: string]: JSX.Element } = {
     PersonalDetails: <PersonalDetails onNext={handleFormSubmit} />,
     EducationDetails: <EducationDetails onNext={handleFormSubmit} />,
-    ProjectDetails: <ProjectDetails onNext={handleFormSubmit} />,
     ExperienceDetails: <ExperienceDetails onNext={handleFormSubmit} />,
+    ProjectDetails: <ProjectDetails onNext={handleFormSubmit} />,
     HobbiesDetails: <HobbiesDetails onNext={handleFormSubmit} />,
     SkillsDetails: <SkillsDetails onNext={handleFormSubmit} />,
   };
@@ -84,9 +84,9 @@ const ResumePage = () => {
                       | "PersonalDetails"
                       | "EducationDetails"
                       | "ExperienceDetails"
+                      | "ProjectDetails"
                       | "HobbiesDetails"
                       | "SkillsDetails"
-                      | "ProjectDetails"
                   )
                 }
                 type="button"
