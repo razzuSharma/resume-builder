@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import fetchDataFromTables from "../../utils/fetchDataFromTables";
 
@@ -28,10 +28,17 @@ const initialState: DataState = {
 
 export const fetchAllData = createAsyncThunk(
   "data/fetchAllData",
-  async (_, thunkAPI) => {
-    const tables = ["personal_details", "education_details", "experience_details", "skills", "project_details", "hobbies"];
+  async (user_id: string, thunkAPI) => {
+    const tables = [
+      "personal_details",
+      "education_details",
+      "experience_details",
+      "skills",
+      "project_details",
+      "hobbies"
+    ];
     try {
-      const data = await fetchDataFromTables(tables);
+      const data = await fetchDataFromTables(tables, user_id);
       return data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);

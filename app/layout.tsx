@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import Navbar from "./navbar/page";
 import { Providers } from "./redux/provider";
 import Footer from "./components/Footer";
-
+import { PDFViewer } from "@react-pdf/renderer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -20,11 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
-          <Navbar />
-          {children}
-          <Footer/>
-        </Providers>
+        <PDFViewer>
+          <Providers>
+            <Navbar />
+            {children}
+            <Footer />
+          </Providers>
+        </PDFViewer>
       </body>
     </html>
   );
