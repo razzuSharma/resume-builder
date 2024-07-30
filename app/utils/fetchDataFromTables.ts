@@ -2,9 +2,14 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const supabaseClient = createClientComponentClient();
 
-const fetchDataFromTables = async (tables: string[]) => {
+const fetchDataFromTables = async (tables: string[], user_id: string) => {
   try {
-    const fetchPromises = tables.map(table => supabaseClient.from(table).select("*"));
+    const fetchPromises = tables.map(table =>
+      supabaseClient
+        .from(table)
+        .select("*")
+        .eq("user_id", user_id)
+    );
     const results = await Promise.all(fetchPromises);
 
     const data = results.map((result, index) => {
