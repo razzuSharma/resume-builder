@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { v4 as uuidv4 } from "uuid";
 import { motion } from "framer-motion";
 import { 
   User, 
@@ -18,12 +17,12 @@ import {
   Camera,
   Upload,
   X,
-  Loader2
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import Image from "next/image";
-import { personalDetailsSchema } from "../utils/validationSchemas";
-import { saveDataIntoSupabase, fetchDataFromTable } from "../utils/supabaseUtils";
-import { uploadProfileImage, validateFile, ALLOWED_IMAGE_TYPES } from "../utils/fileUpload";
+import * as Yup from "yup";
+import { savePersonalDetails, loadPersonalDetails, clearPersonalDetails, notifyResumeUpdate } from "../lib/storage";
 
 interface PersonalDetailsProps {
   onNext: () => void;
@@ -40,8 +39,20 @@ interface MyFormValues {
   website: string;
   github: string;
   profile_image_url: string;
-  user_id?: string;
 }
+
+const personalDetailsSchema = Yup.object({
+  first_name: Yup.string().required("First name is required"),
+  last_name: Yup.string().required("Last name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phone: Yup.string().required("Phone is required"),
+  location: Yup.string(),
+  summary: Yup.string(),
+  linkedin: Yup.string().url("Invalid URL"),
+  website: Yup.string().url("Invalid URL"),
+  github: Yup.string().url("Invalid URL"),
+  profile_image_url: Yup.string(),
+});
 
 const InputField = ({ 
   label, 
@@ -59,7 +70,7 @@ const InputField = ({
   isTextarea?: boolean;
 }) => (
   <div className="space-y-2">
-    <label htmlFor={name} className="text-sm font-medium text-gray-700 flex items-center gap-2">
+    <label htmlFor={name} className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
       <Icon className="w-4 h-4 text-teal-500" />
       {label}
     </label>
@@ -70,7 +81,7 @@ const InputField = ({
         id={name}
         rows={4}
         placeholder={placeholder}
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all duration-200 resize-none"
+        className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all duration-200 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
       />
     ) : (
       <Field
@@ -78,23 +89,23 @@ const InputField = ({
         name={name}
         id={name}
         placeholder={placeholder}
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all duration-200"
+        className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
       />
     )}
     <ErrorMessage
       name={name}
       component="div"
-      className="text-sm text-red-500"
+      className="text-sm text-red-500 dark:text-red-400"
     />
   </div>
 );
 
 const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
-  const [userId, setUserId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string>("");
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [initialValues, setInitialValues] = useState<MyFormValues>({
@@ -108,41 +119,18 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
     website: "",
     github: "",
     profile_image_url: "",
-    user_id: "",
   });
 
   // Load existing data
   useEffect(() => {
-    const loadData = async () => {
-      let storedUserId = localStorage.getItem("user_id");
-      if (!storedUserId) {
-        storedUserId = uuidv4();
-        localStorage.setItem("user_id", storedUserId);
-      }
-      setUserId(storedUserId);
-
-      // Try to fetch existing data
-      const existingData = await fetchDataFromTable("personal_details", storedUserId);
-      if (existingData && existingData.length > 0) {
-        const data = existingData[0];
-        setInitialValues({
-          first_name: data.first_name || "",
-          last_name: data.last_name || "",
-          email: data.email || "",
-          phone: data.phone || "",
-          location: data.location || "",
-          summary: data.summary || "",
-          linkedin: data.linkedin || "",
-          website: data.website || "",
-          github: data.github || "",
-          profile_image_url: data.profile_image_url || "",
-          user_id: storedUserId,
-        });
-        if (data.profile_image_url) {
-          setPreviewImage(data.profile_image_url);
+    const loadData = () => {
+      const savedData = loadPersonalDetails() as MyFormValues | null;
+      if (savedData) {
+        setInitialValues(savedData);
+        if (savedData.profile_image_url) {
+          setPreviewImage(savedData.profile_image_url);
         }
-      } else {
-        setInitialValues(prev => ({ ...prev, user_id: storedUserId || "" }));
+        setLastSaved(new Date());
       }
       setIsLoading(false);
     };
@@ -154,37 +142,22 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file
-    const validation = validateFile(file, {
-      maxSizeMB: 2,
-      allowedTypes: ALLOWED_IMAGE_TYPES,
-    });
-
-    if (!validation.valid) {
-      alert(validation.error);
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("File size must be less than 2MB");
       return;
     }
 
     // Show preview immediately
     const reader = new FileReader();
     reader.onloadend = () => {
-      setPreviewImage(reader.result as string);
+      const result = reader.result as string;
+      setPreviewImage(result);
+      setFieldValue("profile_image_url", result);
+      // Auto-save when image changes
+      handleAutoSave({ ...initialValues, profile_image_url: result });
     };
     reader.readAsDataURL(file);
-
-    // Upload file
-    setIsUploading(true);
-    try {
-      const result = await uploadProfileImage(file, userId);
-      if (result) {
-        setFieldValue("profile_image_url", result.publicUrl);
-      }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Failed to upload image. Please try again.");
-    } finally {
-      setIsUploading(false);
-    }
   };
 
   const handleRemoveImage = (setFieldValue: (field: string, value: any) => void) => {
@@ -195,29 +168,30 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
     }
   };
 
-  const handleSubmit = async (values: MyFormValues, { setSubmitting }: any) => {
+  const handleAutoSave = (values: MyFormValues) => {
+    savePersonalDetails(values);
+    setLastSaved(new Date());
+    notifyResumeUpdate();
+  };
+
+  const handleSubmit = async (values: MyFormValues) => {
     setIsSubmitting(true);
     try {
-      const dataToSave = {
-        ...values,
-        user_id: userId,
-      };
-
-      await saveDataIntoSupabase("personal_details", dataToSave);
+      savePersonalDetails(values);
+      notifyResumeUpdate();
       onNext();
     } catch (error) {
       console.error("Error saving personal details:", error);
       alert("Failed to save. Please try again.");
     } finally {
       setIsSubmitting(false);
-      setSubmitting(false);
     }
   };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-teal-600 dark:text-teal-400 animate-spin" />
       </div>
     );
   }
@@ -231,13 +205,23 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
     >
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
-            <User className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
+              <User className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Personal Details</h2>
+              {lastSaved && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Last saved {lastSaved.toLocaleTimeString()}
+                </p>
+              )}
+            </div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Personal Details</h2>
         </div>
-        <p className="text-gray-600 ml-13">
+        <p className="text-gray-600 dark:text-gray-300">
           Let&apos;s start with your basic information. This will be the header of your resume.
         </p>
       </div>
@@ -249,12 +233,33 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        {({ handleReset, values, setFieldValue, isValid }) => (
+        {({ values, setFieldValue, isValid }) => {
+                const handleClearData = () => {
+                  // Clear from localStorage
+                  clearPersonalDetails();
+                  // Reset all form fields to empty string
+                  setFieldValue("first_name", "");
+                  setFieldValue("last_name", "");
+                  setFieldValue("email", "");
+                  setFieldValue("phone", "");
+                  setFieldValue("location", "");
+                  setFieldValue("summary", "");
+                  setFieldValue("linkedin", "");
+                  setFieldValue("website", "");
+                  setFieldValue("github", "");
+                  setFieldValue("profile_image_url", "");
+                  // Clear preview image
+                  setPreviewImage("");
+                  // Clear last saved indicator
+                  setLastSaved(null);
+                };
+
+                return (
           <Form className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 lg:p-8">
               {/* Profile Image Upload */}
               <div className="mb-8">
-                <label className="text-sm font-medium text-gray-700 mb-3 block flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block flex items-center gap-2">
                   <Camera className="w-4 h-4 text-teal-500" />
                   Profile Photo
                 </label>
@@ -262,7 +267,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
                 <div className="flex items-center gap-4">
                   {/* Preview */}
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-teal-100 to-cyan-100 flex items-center justify-center overflow-hidden border-2 border-dashed border-teal-300">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-900/30 dark:to-cyan-900/30 flex items-center justify-center overflow-hidden border-2 border-dashed border-teal-300 dark:border-teal-600">
                       {previewImage ? (
                         <Image
                           src={previewImage}
@@ -272,13 +277,13 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <User className="w-10 h-10 text-teal-400" />
+                        <User className="w-10 h-10 text-teal-400 dark:text-teal-500" />
                       )}
                     </div>
 
                     {isUploading && (
-                      <div className="absolute inset-0 bg-white/80 rounded-2xl flex items-center justify-center">
-                        <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
+                      <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 rounded-2xl flex items-center justify-center">
+                        <Loader2 className="w-6 h-6 text-teal-600 dark:text-teal-400 animate-spin" />
                       </div>
                     )}
 
@@ -305,13 +310,13 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
                     />
                     <label
                       htmlFor="profile-image"
-                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-50 text-teal-700 rounded-xl hover:bg-teal-100 cursor-pointer transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-300 rounded-xl hover:bg-teal-100 dark:hover:bg-teal-500/20 cursor-pointer transition-colors"
                     >
                       <Upload className="w-4 h-4" />
                       {previewImage ? "Change Photo" : "Upload Photo"}
                     </label>
-                    <p className="text-xs text-gray-500 mt-2">
-                      JPG, PNG, GIF up to 2MB
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      JPG, PNG, GIF up to 2MB. Stored locally in your browser.
                     </p>
                   </div>
                 </div>
@@ -396,7 +401,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
                     icon={FileText}
                     isTextarea
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     This appears at the top of your resume. Keep it concise and impactful.
                   </p>
                 </div>
@@ -407,33 +412,43 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
             <div className="flex items-center justify-between gap-4">
               <button
                 type="button"
-                onClick={() => handleReset()}
-                className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                onClick={handleClearData}
+                className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
               >
                 <RotateCcw className="w-4 h-4" />
                 Reset
               </button>
 
-              <button
-                type="submit"
-                disabled={isSubmitting || isUploading || !isValid}
-                className="inline-flex items-center gap-2 px-8 py-3 text-white bg-gradient-to-r from-teal-600 to-cyan-600 rounded-xl hover:from-teal-700 hover:to-cyan-700 transition-all duration-200 shadow-lg shadow-teal-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting || isUploading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    {isUploading ? "Uploading..." : "Saving..."}
-                  </>
-                ) : (
-                  <>
-                    Next Step
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleAutoSave(values)}
+                  className="px-6 py-3 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 rounded-xl transition-colors"
+                >
+                  Save Draft
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || isUploading || !isValid}
+                  className="inline-flex items-center gap-2 px-8 py-3 text-white bg-gradient-to-r from-teal-600 to-cyan-600 rounded-xl hover:from-teal-700 hover:to-cyan-700 transition-all duration-200 shadow-lg shadow-teal-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      Next Step
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </Form>
-        )}
+                );
+              }}
       </Formik>
     </motion.div>
   );

@@ -1,5 +1,19 @@
 import * as Yup from "yup";
 
+// Custom URL validator that accepts URLs with or without protocol
+const isValidUrl = (value: string | undefined): boolean => {
+  if (!value || value === "") return true;
+  
+  // Accept domain-like patterns: example.com, www.example.com, sub.example.com
+  // Also accept URLs with protocols: http://example.com, https://example.com
+  const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/i;
+  
+  // Accept github.com/username or linkedin.com/in/username patterns
+  const simplePattern = /^[\w.-]+\.[a-z]{2,}(\/.*)?$/i;
+  
+  return urlPattern.test(value) || simplePattern.test(value);
+};
+
 // Personal Details Schema
 export const personalDetailsSchema = Yup.object({
   first_name: Yup.string()
@@ -24,16 +38,16 @@ export const personalDetailsSchema = Yup.object({
     .max(1000, "Summary must be less than 1000 characters")
     .optional(),
   linkedin: Yup.string()
-    .url("Invalid URL")
+    .test("is-valid-url", "Enter a valid URL (e.g., linkedin.com/in/username)", isValidUrl)
     .optional(),
   website: Yup.string()
-    .url("Invalid URL")
+    .test("is-valid-url", "Enter a valid URL (e.g., mywebsite.com)", isValidUrl)
     .optional(),
   github: Yup.string()
-    .url("Invalid URL")
+    .test("is-valid-url", "Enter a valid URL (e.g., github.com/username)", isValidUrl)
     .optional(),
   profile_image_url: Yup.string()
-    .url("Invalid image URL")
+    .test("is-valid-url", "Enter a valid image URL", isValidUrl)
     .optional(),
 });
 
@@ -91,7 +105,7 @@ export const experienceSchema = Yup.object({
         }),
       present: Yup.boolean(),
       responsibilities: Yup.array()
-        .of(Yup.string().min(5, "Responsibility must be at least 5 characters"))
+        .of(Yup.string())
         .min(1, "At least one responsibility is required"),
       achievements: Yup.array()
         .of(Yup.string())
@@ -119,10 +133,10 @@ export const projectSchema = Yup.object({
         }),
       present: Yup.boolean(),
       link: Yup.string()
-        .url("Must be a valid URL")
+        .test("is-valid-url", "Enter a valid URL", isValidUrl)
         .optional(),
       github_link: Yup.string()
-        .url("Must be a valid URL")
+        .test("is-valid-url", "Enter a valid URL", isValidUrl)
         .optional(),
       description: Yup.string()
         .min(10, "Description must be at least 10 characters")

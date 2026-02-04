@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-        domains: ["www.instagram.com"]
-    }
+  output: 'export',
+  distDir: 'dist',
+  images: {
+    unoptimized: true,
+  },
+  trailingSlash: true,
 }
 
 module.exports = nextConfig

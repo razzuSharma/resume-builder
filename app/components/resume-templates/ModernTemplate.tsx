@@ -22,6 +22,17 @@ interface ModernTemplateProps {
   languages?: any[];
 }
 
+/**
+ * Modern Resume Template
+ * 
+ * Fixed A4 Layout:
+ * - Total width: 210mm
+ * - Sidebar: 70mm (1/3)
+ * - Main content: 140mm (2/3)
+ * - Total height: 297mm minimum (A4)
+ * 
+ * Print-optimized with exact millimeter measurements
+ */
 const ModernTemplate: React.FC<ModernTemplateProps> = ({
   personal_details,
   education_details,
@@ -70,85 +81,198 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
   const hobbyList = getHobbies();
 
   return (
-    <div className="bg-white text-gray-900 min-h-[297mm]">
-      {/* Modern Header with Sidebar */}
-      <div className="flex">
-        {/* Left Sidebar */}
-        <div className="w-1/3 bg-gradient-to-b from-teal-600 to-cyan-700 text-white px-6 pt-[14mm] pb-[12mm] min-h-[297mm]">
+    <div 
+      className="modern-resume"
+      style={{
+        // Exact A4 dimensions
+        width: "210mm",
+        minHeight: "297mm",
+        
+        // Font settings
+        fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        fontSize: "11pt",
+        lineHeight: 1.4,
+        
+        // Ensure proper box model
+        boxSizing: "border-box",
+        
+        // Background
+        backgroundColor: "var(--resume-bg, #ffffff)",
+        color: "var(--resume-text, #0f172a)",
+      }}
+    >
+      {/* Main Layout: Sidebar + Content */}
+      <div 
+        className="flex"
+        style={{ 
+          width: "210mm",
+          minHeight: "297mm",
+        }}
+      >
+        {/* Left Sidebar - 70mm exact (1/3 of 210mm) */}
+        <aside
+          className="sidebar"
+          style={{
+            width: "70mm",
+            minHeight: "297mm",
+            background: `linear-gradient(180deg, var(--resume-accent, #0f766e) 0%, var(--resume-accent-dark, #115e59) 100%)`,
+            color: "white",
+            padding: "12mm 5mm 10mm 5mm",
+            boxSizing: "border-box",
+            flexShrink: 0,
+          }}
+        >
           {/* Profile Image */}
           {personal.profile_image_url && (
-            <div className="mb-6">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/30 mx-auto">
+            <div style={{ marginBottom: "6mm", textAlign: "center" }}>
+              <div 
+                style={{
+                  width: "28mm",
+                  height: "28mm",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  border: "2px solid rgba(255,255,255,0.3)",
+                  margin: "0 auto",
+                }}
+              >
                 <Image
                   src={personal.profile_image_url}
                   alt={`${personal.first_name} ${personal.last_name}`}
-                  width={128}
-                  height={128}
-                  className="w-full h-full object-cover"
+                  width={106}
+                  height={106}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
                 />
               </div>
             </div>
           )}
 
           {/* Name */}
-          <h1 className="text-[22px] leading-tight font-bold mb-1 text-center">
+          <h1 style={{
+            fontSize: "16pt",
+            fontWeight: 700,
+            marginBottom: "1mm",
+            textAlign: "center",
+            color: "white",
+            lineHeight: 1.2,
+          }}>
             {personal.first_name || "First"}
           </h1>
-          <h1 className="text-[22px] leading-tight font-bold mb-5 text-center">
+          <h1 style={{
+            fontSize: "16pt",
+            fontWeight: 700,
+            marginBottom: "5mm",
+            textAlign: "center",
+            color: "white",
+            lineHeight: 1.2,
+          }}>
             {personal.last_name || "Last"}
           </h1>
 
           {/* Contact Info */}
-          <div className="space-y-2.5 text-[12px] leading-snug mb-7">
+          <div style={{ marginBottom: "6mm" }}>
             {personal.email && (
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 flex-shrink-0" />
-                <span className="break-all">{personal.email}</span>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "2mm",
+                marginBottom: "2mm",
+                fontSize: "9pt",
+              }}>
+                <Mail style={{ width: "3.5mm", height: "3.5mm", flexShrink: 0, opacity: 0.8 }} />
+                <span style={{ wordBreak: "break-all", opacity: 0.9 }}>{personal.email}</span>
               </div>
             )}
             {personal.phone && (
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 flex-shrink-0" />
-                <span>{personal.phone}</span>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "2mm",
+                marginBottom: "2mm",
+                fontSize: "9pt",
+              }}>
+                <Phone style={{ width: "3.5mm", height: "3.5mm", flexShrink: 0, opacity: 0.8 }} />
+                <span style={{ opacity: 0.9 }}>{personal.phone}</span>
               </div>
             )}
             {personal.location && (
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 flex-shrink-0" />
-                <span>{personal.location}</span>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "2mm",
+                marginBottom: "2mm",
+                fontSize: "9pt",
+              }}>
+                <MapPin style={{ width: "3.5mm", height: "3.5mm", flexShrink: 0, opacity: 0.8 }} />
+                <span style={{ opacity: 0.9 }}>{personal.location}</span>
               </div>
             )}
             {personal.linkedin && (
-              <div className="flex items-center gap-2">
-                <Linkedin className="w-4 h-4 flex-shrink-0" />
-                <span className="break-all">LinkedIn</span>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "2mm",
+                marginBottom: "2mm",
+                fontSize: "9pt",
+              }}>
+                <Linkedin style={{ width: "3.5mm", height: "3.5mm", flexShrink: 0, opacity: 0.8 }} />
+                <span style={{ wordBreak: "break-all", opacity: 0.9 }}>{personal.linkedin}</span>
               </div>
             )}
             {personal.github && (
-              <div className="flex items-center gap-2">
-                <Github className="w-4 h-4 flex-shrink-0" />
-                <span className="break-all">GitHub</span>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "2mm",
+                marginBottom: "2mm",
+                fontSize: "9pt",
+              }}>
+                <Github style={{ width: "3.5mm", height: "3.5mm", flexShrink: 0, opacity: 0.8 }} />
+                <span style={{ wordBreak: "break-all", opacity: 0.9 }}>{personal.github}</span>
               </div>
             )}
             {personal.website && (
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 flex-shrink-0" />
-                <span className="break-all">Portfolio</span>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "2mm",
+                fontSize: "9pt",
+              }}>
+                <Globe style={{ width: "3.5mm", height: "3.5mm", flexShrink: 0, opacity: 0.8 }} />
+                <span style={{ wordBreak: "break-all", opacity: 0.9 }}>{personal.website}</span>
               </div>
             )}
           </div>
 
           {/* Skills Section */}
           {skillList.length > 0 && (
-            <div className="mb-7">
-              <h2 className="text-[13px] font-bold mb-3 border-b border-white/30 pb-2 tracking-[0.14em]">
-                SKILLS
+            <div style={{ marginBottom: "6mm" }}>
+              <h2 style={{
+                fontSize: "10pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                paddingBottom: "1.5mm",
+                borderBottom: "1px solid rgba(255,255,255,0.3)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "white",
+              }}>
+                Skills
               </h2>
-              <div className="flex flex-wrap gap-2">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5mm" }}>
                 {skillList.map((skill: string, index: number) => (
                   <span
                     key={index}
-                    className="px-2.5 py-1 bg-white/20 text-white text-[12px] rounded-full"
+                    style={{
+                      padding: "1mm 2.5mm",
+                      backgroundColor: "rgba(255,255,255,0.2)",
+                      borderRadius: "2mm",
+                      fontSize: "8.5pt",
+                      color: "white",
+                    }}
                   >
                     {skill}
                   </span>
@@ -159,15 +283,31 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
 
           {/* Languages */}
           {languages && languages.length > 0 && (
-            <div className="mb-7">
-              <h2 className="text-[13px] font-bold mb-3 border-b border-white/30 pb-2 tracking-[0.14em]">
-                LANGUAGES
+            <div style={{ marginBottom: "6mm" }}>
+              <h2 style={{
+                fontSize: "10pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                paddingBottom: "1.5mm",
+                borderBottom: "1px solid rgba(255,255,255,0.3)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "white",
+              }}>
+                Languages
               </h2>
-              <div className="space-y-2">
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5mm" }}>
                 {languages.map((lang, index) => (
-                  <div key={index} className="flex justify-between text-[12px] tabular-nums">
-                    <span>{lang.language}</span>
-                    <span className="text-white/70">{lang.proficiency}</span>
+                  <div 
+                    key={index} 
+                    style={{ 
+                      display: "flex", 
+                      justifyContent: "space-between",
+                      fontSize: "9pt",
+                    }}
+                  >
+                    <span style={{ opacity: 0.9 }}>{lang.language}</span>
+                    <span style={{ opacity: 0.7 }}>{lang.proficiency}</span>
                   </div>
                 ))}
               </div>
@@ -177,14 +317,29 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
           {/* Hobbies */}
           {hobbyList.length > 0 && (
             <div>
-              <h2 className="text-[13px] font-bold mb-3 border-b border-white/30 pb-2 tracking-[0.14em]">
-                INTERESTS
+              <h2 style={{
+                fontSize: "10pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                paddingBottom: "1.5mm",
+                borderBottom: "1px solid rgba(255,255,255,0.3)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "white",
+              }}>
+                Interests
               </h2>
-              <div className="flex flex-wrap gap-2">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5mm" }}>
                 {hobbyList.map((hobby: string, index: number) => (
                   <span
                     key={index}
-                    className="px-2.5 py-1 bg-white/20 text-white text-[12px] rounded-full"
+                    style={{
+                      padding: "1mm 2.5mm",
+                      backgroundColor: "rgba(255,255,255,0.2)",
+                      borderRadius: "2mm",
+                      fontSize: "8.5pt",
+                      color: "white",
+                    }}
                   >
                     {hobby}
                   </span>
@@ -192,40 +347,93 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
               </div>
             </div>
           )}
-        </div>
+        </aside>
 
-        {/* Main Content */}
-        <div className="w-2/3 px-7 pt-[14mm] pb-[12mm]">
+        {/* Main Content - 140mm exact (2/3 of 210mm) */}
+        <main
+          style={{
+            width: "140mm",
+            minHeight: "297mm",
+            padding: "12mm 6mm 10mm 6mm",
+            boxSizing: "border-box",
+            backgroundColor: "var(--resume-bg, #ffffff)",
+            flexShrink: 0,
+          }}
+        >
           {/* Summary */}
           {personal.summary && (
-            <section className="mb-7">
-              <h2 className="text-[13px] font-bold text-teal-800 mb-3 uppercase tracking-[0.14em]">
+            <section style={{ marginBottom: "6mm" }}>
+              <h2 style={{
+                fontSize: "11pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--resume-accent, #0f766e)",
+              }}>
                 Profile
               </h2>
-              <p className="text-[12.5px] leading-relaxed text-gray-700">{personal.summary}</p>
+              <p style={{
+                fontSize: "10pt",
+                lineHeight: 1.5,
+                color: "var(--resume-text-muted, #475569)",
+                textAlign: "justify",
+              }}>
+                {personal.summary}
+              </p>
             </section>
           )}
 
           {/* Experience */}
           {experience_details.length > 0 && (
-            <section className="mb-7">
-              <h2 className="text-[13px] font-bold text-teal-800 mb-3 uppercase tracking-[0.14em]">
+            <section style={{ marginBottom: "6mm" }}>
+              <h2 style={{
+                fontSize: "11pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--resume-accent, #0f766e)",
+              }}>
                 Experience
               </h2>
-              <div className="space-y-5">
+              <div style={{ display: "flex", flexDirection: "column", gap: "4mm" }}>
                 {experience_details.map((exp, index) => (
                   <div key={index}>
-                    <h3 className="font-bold text-gray-900">{exp.position}</h3>
-                    <p className="text-teal-600 font-medium">{exp.company_name}</p>
-                    <p className="text-[12px] text-gray-500 mb-2 tabular-nums">
-                      {formatDate(exp.start_date)} -{" "}
-                      {exp.present ? "Present" : formatDate(exp.end_date)}
+                    <h3 style={{
+                      fontSize: "10.5pt",
+                      fontWeight: 700,
+                      marginBottom: "0.5mm",
+                      color: "var(--resume-text, #0f172a)",
+                    }}>
+                      {exp.position}
+                    </h3>
+                    <p style={{
+                      fontSize: "10pt",
+                      fontWeight: 600,
+                      marginBottom: "0.5mm",
+                      color: "var(--resume-accent, #0f766e)",
+                    }}>
+                      {exp.company_name}
+                    </p>
+                    <p style={{
+                      fontSize: "9pt",
+                      marginBottom: "1.5mm",
+                      color: "var(--resume-text-muted, #475569)",
+                    }}>
+                      {formatDate(exp.start_date)} - {exp.present ? "Present" : formatDate(exp.end_date)}
                       {exp.location && ` | ${exp.location}`}
                     </p>
                     {exp.responsibilities && exp.responsibilities.length > 0 && (
-                      <ul className="list-disc list-inside text-[12.5px] leading-relaxed text-gray-700 space-y-1">
+                      <ul style={{
+                        margin: 0,
+                        paddingLeft: "4mm",
+                        fontSize: "9.5pt",
+                        lineHeight: 1.5,
+                        color: "var(--resume-text-muted, #475569)",
+                      }}>
                         {exp.responsibilities.map((resp: string, i: number) =>
-                          resp ? <li key={i}>{resp}</li> : null
+                          resp ? <li key={i} style={{ marginBottom: "0.5mm" }}>{resp}</li> : null
                         )}
                       </ul>
                     )}
@@ -237,21 +445,46 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
 
           {/* Education */}
           {education_details.length > 0 && (
-            <section className="mb-7">
-              <h2 className="text-[13px] font-bold text-teal-800 mb-3 uppercase tracking-[0.14em]">
+            <section style={{ marginBottom: "6mm" }}>
+              <h2 style={{
+                fontSize: "11pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--resume-accent, #0f766e)",
+              }}>
                 Education
               </h2>
-              <div className="space-y-4">
+              <div style={{ display: "flex", flexDirection: "column", gap: "3mm" }}>
                 {education_details.map((edu, index) => (
                   <div key={index}>
-                    <h3 className="font-bold text-gray-900">{edu.degree}</h3>
-                    <p className="text-teal-600">{edu.school_name}</p>
-                    <p className="text-[12px] text-gray-500">
+                    <h3 style={{
+                      fontSize: "10.5pt",
+                      fontWeight: 700,
+                      marginBottom: "0.5mm",
+                      color: "var(--resume-text, #0f172a)",
+                    }}>
+                      {edu.degree}
+                    </h3>
+                    <p style={{
+                      fontSize: "10pt",
+                      fontWeight: 600,
+                      color: "var(--resume-accent, #0f766e)",
+                    }}>
+                      {edu.school_name}
+                    </p>
+                    <p style={{
+                      fontSize: "9pt",
+                      color: "var(--resume-text-muted, #475569)",
+                    }}>
                       {edu.field_of_study}
                     </p>
-                    <p className="text-[12px] text-gray-500 tabular-nums">
-                      {formatDate(edu.start_date)} -{" "}
-                      {edu.present ? "Present" : formatDate(edu.end_date)}
+                    <p style={{
+                      fontSize: "9pt",
+                      color: "var(--resume-text-muted, #475569)",
+                    }}>
+                      {formatDate(edu.start_date)} - {edu.present ? "Present" : formatDate(edu.end_date)}
                       {edu.gpa && ` | GPA: ${edu.gpa}`}
                     </p>
                   </div>
@@ -262,24 +495,51 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
 
           {/* Projects */}
           {project_details.length > 0 && (
-            <section className="mb-7">
-              <h2 className="text-[13px] font-bold text-teal-800 mb-3 uppercase tracking-[0.14em]">
+            <section style={{ marginBottom: "6mm" }}>
+              <h2 style={{
+                fontSize: "11pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--resume-accent, #0f766e)",
+              }}>
                 Projects
               </h2>
-              <div className="space-y-4">
+              <div style={{ display: "flex", flexDirection: "column", gap: "3mm" }}>
                 {project_details.map((project, index) => (
                   <div key={index}>
-                    <h3 className="font-bold text-gray-900">{project.name}</h3>
-                    <p className="text-[12px] text-gray-500 mb-1 tabular-nums">
-                      {formatDate(project.start_date)} -{" "}
-                      {project.present ? "Present" : formatDate(project.end_date)}
+                    <h3 style={{
+                      fontSize: "10.5pt",
+                      fontWeight: 700,
+                      marginBottom: "0.5mm",
+                      color: "var(--resume-text, #0f172a)",
+                    }}>
+                      {project.name}
+                    </h3>
+                    <p style={{
+                      fontSize: "9pt",
+                      marginBottom: "1mm",
+                      color: "var(--resume-text-muted, #475569)",
+                    }}>
+                      {formatDate(project.start_date)} - {project.present ? "Present" : formatDate(project.end_date)}
                     </p>
                     {project.technologies && project.technologies.length > 0 && (
-                      <p className="text-[12px] text-teal-700 mb-1">
+                      <p style={{
+                        fontSize: "9pt",
+                        marginBottom: "1mm",
+                        color: "var(--resume-accent, #0f766e)",
+                      }}>
                         {project.technologies.join(" • ")}
                       </p>
                     )}
-                    <p className="text-[12.5px] leading-relaxed text-gray-700">{project.description}</p>
+                    <p style={{
+                      fontSize: "9.5pt",
+                      lineHeight: 1.5,
+                      color: "var(--resume-text-muted, #475569)",
+                    }}>
+                      {project.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -289,15 +549,37 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
           {/* Certifications */}
           {certifications && certifications.length > 0 && (
             <section>
-              <h2 className="text-[13px] font-bold text-teal-800 mb-3 uppercase tracking-[0.14em]">
+              <h2 style={{
+                fontSize: "11pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--resume-accent, #0f766e)",
+              }}>
                 Certifications
               </h2>
-              <div className="space-y-3">
+              <div style={{ display: "flex", flexDirection: "column", gap: "3mm" }}>
                 {certifications.map((cert, index) => (
                   <div key={index}>
-                    <h3 className="font-bold text-gray-900">{cert.name}</h3>
-                    <p className="text-teal-600">{cert.issuing_organization}</p>
-                    <p className="text-[12px] text-gray-500 tabular-nums">
+                    <h3 style={{
+                      fontSize: "10.5pt",
+                      fontWeight: 700,
+                      marginBottom: "0.5mm",
+                      color: "var(--resume-text, #0f172a)",
+                    }}>
+                      {cert.name}
+                    </h3>
+                    <p style={{
+                      fontSize: "10pt",
+                      color: "var(--resume-accent, #0f766e)",
+                    }}>
+                      {cert.issuing_organization}
+                    </p>
+                    <p style={{
+                      fontSize: "9pt",
+                      color: "var(--resume-text-muted, #475569)",
+                    }}>
                       {formatDate(cert.issue_date)}
                     </p>
                   </div>
@@ -305,7 +587,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
               </div>
             </section>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );
