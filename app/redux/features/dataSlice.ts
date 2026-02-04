@@ -1,18 +1,13 @@
 'use client';
+
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import fetchDataFromTables from "../../utils/fetchDataFromTables";
+import type { ResumeData } from "../../types";
 
 // Define a type for the slice state
-interface DataState {
-  personal_details: any[];
-  education_details: any[];
-  experience_details: any[];
-  skills: any[];
-  project_details: any[];
-  hobbies: any[];
+interface DataState extends ResumeData {
   loading: boolean;
   error: string | null;
-  [key: string]: any[] | boolean | string | null;
 }
 
 const initialState: DataState = {
@@ -22,6 +17,8 @@ const initialState: DataState = {
   skills: [],
   project_details: [],
   hobbies: [],
+  certifications: [],
+  languages: [],
   loading: false,
   error: null,
 };
@@ -35,7 +32,9 @@ export const fetchAllData = createAsyncThunk(
       "experience_details",
       "skills",
       "project_details",
-      "hobbies"
+      "hobbies",
+      "certifications",
+      "languages"
     ];
     try {
       const data = await fetchDataFromTables(tables, user_id);
@@ -49,7 +48,37 @@ export const fetchAllData = createAsyncThunk(
 const dataSlice = createSlice({
   name: "data",
   initialState,
-  reducers: {},
+  reducers: {
+    clearData: (state) => {
+      state.personal_details = [];
+      state.education_details = [];
+      state.experience_details = [];
+      state.skills = [];
+      state.project_details = [];
+      state.hobbies = [];
+      state.certifications = [];
+      state.languages = [];
+      state.error = null;
+    },
+    updatePersonalDetails: (state, action: PayloadAction<any>) => {
+      state.personal_details = [action.payload];
+    },
+    updateEducation: (state, action: PayloadAction<any[]>) => {
+      state.education_details = action.payload;
+    },
+    updateExperience: (state, action: PayloadAction<any[]>) => {
+      state.experience_details = action.payload;
+    },
+    updateProjects: (state, action: PayloadAction<any[]>) => {
+      state.project_details = action.payload;
+    },
+    updateSkills: (state, action: PayloadAction<any[]>) => {
+      state.skills = action.payload;
+    },
+    updateHobbies: (state, action: PayloadAction<any[]>) => {
+      state.hobbies = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllData.pending, (state) => {
@@ -61,15 +90,49 @@ const dataSlice = createSlice({
         (state, action: PayloadAction<{ tableName: string; data: any[] }[]>) => {
           state.loading = false;
           action.payload.forEach(({ tableName, data }) => {
-            state[tableName] = data;
+            switch (tableName) {
+              case "personal_details":
+                state.personal_details = data || [];
+                break;
+              case "education_details":
+                state.education_details = data || [];
+                break;
+              case "experience_details":
+                state.experience_details = data || [];
+                break;
+              case "skills":
+                state.skills = data || [];
+                break;
+              case "project_details":
+                state.project_details = data || [];
+                break;
+              case "hobbies":
+                state.hobbies = data || [];
+                break;
+              case "certifications":
+                state.certifications = data || [];
+                break;
+              case "languages":
+                state.languages = data || [];
+                break;
+            }
           });
         }
       )
       .addCase(fetchAllData.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to fetch data";
       });
   },
 });
 
+export const { 
+  clearData, 
+  updatePersonalDetails,
+  updateEducation,
+  updateExperience,
+  updateProjects,
+  updateSkills,
+  updateHobbies
+} = dataSlice.actions;
 export default dataSlice.reducer;

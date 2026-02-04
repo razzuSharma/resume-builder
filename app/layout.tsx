@@ -4,12 +4,12 @@ import { Inter } from "next/font/google";
 import Navbar from "./navbar/page";
 import { Providers } from "./redux/provider";
 import Footer from "./components/Footer";
-import { PDFViewer } from "@react-pdf/renderer";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Resume Artisan",
-  description: "Created via NextJS",
+  title: "Resume Artisan - Build Professional Resumes",
+  description: "Create stunning professional resumes with ease using Resume Artisan",
 };
 
 export default function RootLayout({
@@ -20,13 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <PDFViewer>
-          <Providers>
-            <Navbar />
+        <Providers>
+          <Navbar />
+          <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             {children}
-            <Footer />
-          </Providers>
-        </PDFViewer>
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
