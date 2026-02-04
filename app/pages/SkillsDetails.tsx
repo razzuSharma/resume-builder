@@ -13,15 +13,10 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { skillsSchema } from "../utils/validationSchemas";
-import { saveDataIntoSupabase } from "../utils/supabaseUtils";
+import { saveSkills, loadSkills, clearSkills, notifyResumeUpdate } from "../lib/storage";
 
 interface SkillsDetailsProps {
   onNext: () => void;
-}
-
-interface MyFormValues {
-  skills: string[];
-  user_id?: string;
 }
 
 const suggestedSkills = [
@@ -31,46 +26,47 @@ const suggestedSkills = [
 ];
 
 const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
-  const [userId, setUserId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newSkill, setNewSkill] = useState("");
+  const [initialValues, setInitialValues] = useState({ skills: [] as string[] });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem("user_id");
-    if (storedUserId) {
-      setUserId(storedUserId);
+    const savedData = loadSkills();
+    if (savedData && savedData.length > 0) {
+      setInitialValues({ skills: savedData });
+    } else {
+      setInitialValues({ skills: [] });
     }
+    setIsLoading(false);
   }, []);
 
-  const initialValues: MyFormValues = {
-    skills: [],
-    user_id: userId,
-  };
-
-  const handleSubmit = async (values: MyFormValues, { setSubmitting }: any) => {
+  const handleSubmit = async (values: { skills: string[] }) => {
     if (values.skills.length === 0) {
       alert("Please add at least one skill");
-      setSubmitting(false);
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Save skills as JSON string
-      const dataToSave = {
-        skills: JSON.stringify(values.skills),
-        user_id: userId,
-      };
-      await saveDataIntoSupabase("skills", dataToSave);
+      saveSkills(values.skills);
+      notifyResumeUpdate();
       onNext();
     } catch (error) {
       console.error("Error saving skills:", error);
       alert("Failed to save. Please try again.");
     } finally {
       setIsSubmitting(false);
-      setSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -85,9 +81,9 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
             <Wand2 className="w-5 h-5 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Skills</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Skills</h2>
         </div>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           Add your technical and professional skills. These help recruiters find you.
         </p>
       </div>
@@ -99,12 +95,12 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        {({ values, handleReset, setFieldValue }) => (
+        {({ values, setFieldValue }) => (
           <Form className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 lg:p-8">
               {/* Add Skill Input */}
               <div className="mb-6">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                   Add a Skill
                 </label>
                 <div className="flex gap-2">
@@ -122,7 +118,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
                       }
                     }}
                     placeholder="Type a skill and press Enter..."
-                    className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                    className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                   <button
                     type="button"
@@ -144,14 +140,14 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
               <FieldArray name="skills">
                 {({ remove }) => (
                   <div className="mb-6">
-                    <label className="text-sm font-medium text-gray-700 mb-3 block">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">
                       Your Skills ({values.skills.length})
                     </label>
                     {values.skills.length === 0 ? (
-                      <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                        <Wand2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">No skills added yet</p>
-                        <p className="text-sm text-gray-400">
+                      <div className="text-center py-12 bg-gray-50 dark:bg-gray-700/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-600">
+                        <Wand2 className="w-12 h-12 text-gray-300 dark:text-gray-500 mx-auto mb-3" />
+                        <p className="text-gray-500 dark:text-gray-400">No skills added yet</p>
+                        <p className="text-sm text-gray-400 dark:text-gray-500">
                           Add skills above or select from suggestions below
                         </p>
                       </div>
@@ -180,7 +176,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
                     <ErrorMessage
                       name="skills"
                       component="div"
-                      className="text-sm text-red-500 mt-2"
+                      className="text-sm text-red-500 dark:text-red-400 mt-2"
                     />
                   </div>
                 )}
@@ -188,7 +184,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
 
               {/* Suggested Skills */}
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-500" />
                   Suggested Skills
                 </label>
@@ -202,7 +198,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
                         onClick={() =>
                           setFieldValue("skills", [...values.skills, skill])
                         }
-                        className="px-3 py-1.5 bg-gray-100 hover:bg-blue-100 text-gray-700 hover:text-blue-700 rounded-lg text-sm transition-colors"
+                        className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 rounded-lg text-sm transition-colors"
                       >
                         + {skill}
                       </button>
@@ -212,8 +208,8 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
 
               {/* Quick Actions */}
               {values.skills.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-gray-100">
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-500" />
                       <span>{values.skills.length} skills added</span>
@@ -221,7 +217,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
                     <button
                       type="button"
                       onClick={() => setFieldValue("skills", [])}
-                      className="text-red-500 hover:text-red-600 ml-auto"
+                      className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 ml-auto"
                     >
                       Clear all
                     </button>
@@ -234,30 +230,45 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
             <div className="flex items-center justify-between gap-4">
               <button
                 type="button"
-                onClick={() => handleReset()}
-                className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                onClick={() => {
+                      clearSkills();
+                      setFieldValue("skills", []);
+                    }}
+                className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
               >
                 <RotateCcw className="w-4 h-4" />
                 Reset
               </button>
 
-              <button
-                type="submit"
-                disabled={isSubmitting || values.skills.length === 0}
-                className="inline-flex items-center gap-2 px-8 py-3 text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    Next Step
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    saveSkills(values.skills);
+                    notifyResumeUpdate();
+                  }}
+                  className="px-6 py-3 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl transition-colors"
+                >
+                  Save Draft
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || values.skills.length === 0}
+                  className="inline-flex items-center gap-2 px-8 py-3 text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      Next Step
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </Form>
         )}

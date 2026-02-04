@@ -2,68 +2,219 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom scrollbar */
+/* ============================================
+   DARK/LIGHT MODE BASE STYLES
+   ============================================ */
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0d9488;
+  --muted: #64748b;
+  --accent: #0d9488;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --border: #334155;
+  --input: #334155;
+  --ring: #2dd4bf;
+  --muted: #94a3b8;
+  --accent: #2dd4bf;
+}
+
+/* ============================================
+   RESUME THEMES (Works in both light/dark)
+   ============================================ */
+
+.resume-paper {
+  --resume-accent: #0f766e;
+  --resume-accent-dark: #115e59;
+  --resume-accent-light: #14b8a6;
+  --resume-bg: #ffffff;
+  --resume-text: #0f172a;
+  --resume-text-muted: #475569;
+  --resume-border: #e2e8f0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* Slate Variant */
+.resume-variant-slate {
+  --resume-accent: #334155;
+  --resume-accent-dark: #1e293b;
+  --resume-accent-light: #64748b;
+}
+
+/* Teal Variant */
+.resume-variant-teal {
+  --resume-accent: #0f766e;
+  --resume-accent-dark: #115e59;
+  --resume-accent-light: #14b8a6;
+}
+
+/* Navy Variant */
+.resume-variant-navy {
+  --resume-accent: #1e40af;
+  --resume-accent-dark: #1e3a8a;
+  --resume-accent-light: #3b82f6;
+}
+
+/* Rose Variant */
+.resume-variant-rose {
+  --resume-accent: #be123c;
+  --resume-accent-dark: #9f1239;
+  --resume-accent-light: #f43f5e;
+}
+
+/* Forest Variant */
+.resume-variant-forest {
+  --resume-accent: #166534;
+  --resume-accent-dark: #14532d;
+  --resume-accent-light: #22c55e;
+}
+
+/* Violet Variant */
+.resume-variant-violet {
+  --resume-accent: #6d28d9;
+  --resume-accent-dark: #5b21b6;
+  --resume-accent-light: #a78bfa;
+}
+
+/* Serif variant override */
+.resume-variant-navy,
+.resume-variant-slate.serif {
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR (Dark/Light Aware)
+   ============================================ */
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: var(--border);
+  border-radius: 5px;
+  border: 2px solid var(--background);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--muted);
 }
 
-/* Print styles for resume */
+/* ============================================
+   PRINT STYLES - A4 Optimized
+   ============================================ */
+
 @media print {
   @page {
     margin: 0;
-    size: A4;
+    size: A4 portrait;
   }
 
-  body {
-    background: white;
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
+  html, body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: auto !important;
+  }
+
+  /* Hide all UI elements */
   nav,
   footer,
-  .no-print {
+  .no-print,
+  .print\:hidden,
+  [class*="Toast"],
+  [class*="Modal"],
+  [class*="fixed"] {
     display: none !important;
   }
 
-  main {
+  /* Reset main content area */
+  main,
+  #main-content,
+  [role="main"] {
     padding: 0 !important;
+    margin: 0 !important;
     min-height: auto !important;
+    background: white !important;
+    width: 100% !important;
+    max-width: none !important;
   }
 
-  /* Ensure the resume takes full page */
-  .resume-paper {
+  /* Resume paper - exact A4 dimensions */
+  .resume-paper,
+  .modern-resume {
     box-shadow: none !important;
     margin: 0 !important;
+    padding: 0 !important;
     width: 210mm !important;
     min-height: 297mm !important;
+    max-width: none !important;
+    background: white !important;
+    transform: none !important;
+    position: static !important;
+    overflow: visible !important;
+    page-break-inside: avoid !important;
   }
+
+  /* Resume wrapper scaling reset */
+  .resume-a4-wrapper {
+    transform: none !important;
+    margin: 0 !important;
+    width: 210mm !important;
+  }
+
+  /* Ensure content doesn't break awkwardly */
+  .modern-resume section,
+  .modern-resume aside,
+  .modern-resume main {
+    page-break-inside: avoid;
+  }
+
+  /* Force light theme colors for print */
+  .resume-paper,
+  .modern-resume {
+    --resume-bg: #ffffff !important;
+    --resume-text: #0f172a !important;
+    --resume-text-muted: #475569 !important;
+    --resume-border: #e2e8f0 !important;
+  }
+
+  /* Preserve accent colors */
+  .resume-variant-slate { --resume-accent: #334155 !important; --resume-accent-dark: #1e293b !important; }
+  .resume-variant-teal { --resume-accent: #0f766e !important; --resume-accent-dark: #115e59 !important; }
+  .resume-variant-navy { --resume-accent: #1e40af !important; --resume-accent-dark: #1e3a8a !important; }
+  .resume-variant-rose { --resume-accent: #be123c !important; --resume-accent-dark: #9f1239 !important; }
+  .resume-variant-forest { --resume-accent: #166534 !important; --resume-accent-dark: #14532d !important; }
+  .resume-variant-violet { --resume-accent: #6d28d9 !important; --resume-accent-dark: #5b21b6 !important; }
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
+/* ============================================
+   ANIMATIONS
+   ============================================ */
 
-/* Focus styles for accessibility */
-*:focus-visible {
-  outline: 2px solid #0d9488;
-  outline-offset: 2px;
-}
-
-/* Animation utilities */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -79,17 +230,55 @@ html {
   animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Gradient text utility */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
 .text-gradient {
   @apply bg-clip-text text-transparent;
 }
 
-/* Glass effect */
 .glass {
-  @apply bg-white/80 backdrop-blur-md;
+  @apply bg-white/80 backdrop-blur-md dark:bg-gray-900/80;
 }
 
-/* Card hover effect */
 .card-hover {
   @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+}
+
+/* Focus visible styles */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--accent);
+  color: white;
+}
+
+.dark ::selection {
+  background-color: var(--accent);
+  color: #0f172a;
 }

@@ -26,7 +26,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-white border-t border-gray-100">
+    <footer className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -36,30 +36,30 @@ const Footer = () => {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-teal-700 to-cyan-700 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-teal-700 to-cyan-700 dark:from-teal-400 dark:to-cyan-400 bg-clip-text text-transparent">
                 Resume Artisan
               </span>
             </Link>
-            <p className="text-gray-600 max-w-sm mb-6">
+            <p className="text-gray-600 dark:text-gray-300 max-w-sm mb-6">
               Create professional, ATS-friendly resumes in minutes. 
               Stand out from the crowd and land your dream job.
             </p>
             <div className="flex items-center gap-4">
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-teal-100 hover:text-teal-700 transition-colors"
+                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-teal-100 dark:hover:bg-teal-900/50 hover:text-teal-700 dark:hover:text-teal-400 transition-colors"
               >
                 <Twitter className="w-5 h-5" />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-teal-100 hover:text-teal-700 transition-colors"
+                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-teal-100 dark:hover:bg-teal-900/50 hover:text-teal-700 dark:hover:text-teal-400 transition-colors"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-teal-100 hover:text-teal-700 transition-colors"
+                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-teal-100 dark:hover:bg-teal-900/50 hover:text-teal-700 dark:hover:text-teal-400 transition-colors"
               >
                 <Github className="w-5 h-5" />
               </a>
@@ -69,13 +69,13 @@ const Footer = () => {
           {/* Links */}
           {footerLinks.map((section) => (
             <div key={section.title}>
-              <h3 className="font-semibold text-gray-900 mb-4">{section.title}</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{section.title}</h3>
               <ul className="space-y-3">
                 {section.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-gray-600 hover:text-teal-700 transition-colors"
+                      className="text-gray-600 dark:text-gray-300 hover:text-teal-700 dark:hover:text-teal-400 transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -87,18 +87,18 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="py-6 border-t border-gray-100">
+        <div className="py-6 border-t border-gray-100 dark:border-gray-800">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               © {currentYear} Resume Artisan. All rights reserved.
             </p>
-            <p className="text-sm text-gray-500 flex items-center gap-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
               Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by{" "}
               <a
-                href="https://rajusarma.com.np/"
+                href="https://rajusharmadahal.com.np/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-teal-700 hover:underline"
+                className="text-teal-700 dark:text-teal-400 hover:underline"
               >
                 Raju Sharma
               </a>

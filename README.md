@@ -1,266 +1,150 @@
 # Resume Artisan
 
-A modern, professional resume builder built with Next.js, TypeScript, Tailwind CSS, and Supabase.
+A beautiful, free resume builder that works entirely in your browser. No signup required, no data sent to servers - your privacy is guaranteed.
 
-![Resume Artisan](public/ResumeArtisan.jpeg)
+[![Deploy to GitHub Pages](https://github.com/yourusername/resume-artisan/actions/workflows/deploy.yml/badge.svg)](https://github.com/yourusername/resume-artisan/actions/workflows/deploy.yml)
 
-## Features
+![Resume Artisan](https://img.shields.io/badge/Resume-Artisan-teal)
+![Next.js](https://img.shields.io/badge/Next.js-13-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-cyan)
 
-- ✨ **Beautiful, Modern UI** - Clean, professional design with smooth animations
-- 📝 **Multi-Step Form** - Easy-to-use wizard for entering resume details
-- 🎨 **Real-time Preview** - See your resume as you build it
-- 📄 **PDF Export** - Download your resume as a high-quality PDF
-- 📸 **Profile Image Upload** - Add a professional photo to your resume
-- 💾 **Auto-Save** - Data persists in localStorage and Supabase
-- 📱 **Fully Responsive** - Works on desktop, tablet, and mobile
-- 🎯 **Form Validation** - Client-side validation with helpful error messages
-- ♿ **Accessible** - Built with accessibility in mind
-- 🔒 **Row Level Security** - Your data is protected with Supabase RLS
+## ✨ Features
 
-## Tech Stack
+- 🎨 **Beautiful Templates** - Modern and Classic designs with 6 color variants
+- 🔒 **Privacy First** - All data stays in your browser (localStorage)
+- ⚡ **Live Preview** - See changes in real-time as you type
+- 📱 **Mobile Friendly** - Works on all devices
+- 🌙 **Dark Mode** - Full dark theme support
+- 📄 **PDF Export** - High-quality PDF generation
+- 💾 **Auto-Save** - Never lose your progress
+- 📤 **Export/Import** - Backup and restore your data
+- 🆓 **100% Free** - No hidden costs or premium features
 
-- **Framework:** Next.js 13 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **UI Components:** Headless UI, Lucide React icons
-- **State Management:** Redux Toolkit
-- **Forms:** Formik + Yup validation
-- **Animations:** Framer Motion
-- **Database:** Supabase (PostgreSQL)
-- **File Storage:** Supabase Storage
-- **PDF Generation:** html2canvas + jsPDF
+## 🚀 Quick Start
 
-## Quick Start
+### Online (Recommended)
+Visit: [https://yourusername.github.io/resume-artisan](https://yourusername.github.io/resume-artisan)
 
-### Prerequisites
+### Local Development
 
-- Node.js 16+ 
-- npm or yarn
-- Supabase account (free tier available)
-
-### Installation
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/resume-artisan.git
+# Clone the repository
+git clone https://github.com/yourusername/resume-artisan.git
 cd resume-artisan
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Set up environment variables:
-```bash
-cp .env.local.example .env.local
-```
-
-Edit `.env.local` and add your Supabase credentials:
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-4. Run the development server:
-```bash
+# Run development server
 npm run dev
+
+# Open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the result.
+## 🏗️ Architecture
 
-## Supabase Setup
+### Pure Client-Side Application
 
-### Step 1: Create a Project
+Unlike most resume builders, we don't use a backend database:
 
-1. Go to [Supabase Dashboard](https://app.supabase.com)
-2. Create a new project
-3. Note your project URL and anon key (in Project Settings → API)
+```
+User Input → localStorage → PDF Export
+     ↓
+Live Preview (real-time)
+```
 
-### Step 2: Run Database Migration
+**Benefits:**
+- ⚡ Instant saves (no network latency)
+- 🔒 Complete privacy
+- 💰 Zero hosting costs
+- 📴 Works offline
 
-1. In your Supabase dashboard, go to **SQL Editor**
-2. Click "New Query"
-3. Copy and paste the entire contents of `supabase/migrations/001_initial_schema.sql`
-4. Click "Run"
+### Tech Stack
 
-This creates all necessary tables:
-- `personal_details` - User profile info
-- `education_details` - Education history
-- `experience_details` - Work experience
-- `project_details` - Personal/professional projects
-- `skills` - Technical/professional skills
-- `hobbies` - Personal interests
-- `certifications` - Professional certifications
-- `languages` - Language proficiencies
+| Technology | Purpose |
+|------------|---------|
+| Next.js 13 | React framework with App Router |
+| TypeScript | Type safety |
+| Tailwind CSS | Styling |
+| shadcn/ui | UI components |
+| Formik | Form handling |
+| Framer Motion | Animations |
+| html2canvas + jsPDF | PDF generation |
 
-### Step 3: Set Up Storage Buckets
-
-For file uploads (profile images, certificates, etc.):
-
-1. Go to **Storage** in your Supabase dashboard
-2. Create these buckets (set to Public):
-   - `profiles` - Profile pictures
-   - `resumes` - Resume PDF exports
-   - `projects` - Project screenshots
-   - `certificates` - Certificate images
-
-Detailed setup instructions: [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 app/
-├── components/          # Reusable components
-│   ├── Button.tsx      # Button component with variants
-│   ├── Footer.tsx      # Site footer
-│   ├── ResumeLayout.tsx # Resume display component
-│   └── SuccessMessageToast.tsx
-├── pages/              # Form step components
-│   ├── PersonalDetails.tsx    # Profile photo upload
-│   ├── EducationDetails.tsx
-│   ├── ExperienceDetails.tsx
-│   ├── ProjectDetails.tsx
-│   ├── SkillsDetails.tsx
-│   └── HobbiesDetails.tsx
-├── types/              # TypeScript type definitions
-│   └── index.ts        # All data types
-├── redux/              # Redux store configuration
-│   ├── features/
-│   │   └── dataSlice.ts
-│   ├── hooks.ts
-│   ├── provider.tsx
-│   └── store.ts
-├── utils/              # Utility functions
-│   ├── supabaseClient.ts      # Supabase client setup
-│   ├── supabaseUtils.ts       # Database operations
-│   ├── fetchDataFromTables.ts # Data fetching
-│   ├── fileUpload.ts          # File upload utilities
-│   └── validationSchemas.ts   # Form validation
-├── contact-us/
-│   └── page.tsx
-├── create-resume/
-│   └── page.tsx       # Main resume builder page
-├── navbar/
-│   └── page.tsx       # Navigation component
-├── resume/
-│   └── page.tsx       # Resume preview & download page
-├── layout.tsx         # Root layout
-└── page.tsx           # Home page
-
-supabase/
-└── migrations/
-    └── 001_initial_schema.sql  # Database schema
+├── components/           # React components
+│   ├── resume-templates/ # Resume templates
+│   ├── DataManager.tsx   # Export/Import UI
+│   ├── LivePreview.tsx   # Real-time preview
+│   └── ...
+├── pages/               # Form sections
+├── lib/                 # Core utilities
+│   └── storage.ts       # localStorage functions
+└── ...
 ```
 
-## Form Sections
+## 🚀 Deployment
 
-1. **Personal Details** - Name, contact info, summary, profile photo
-2. **Education** - Schools, degrees, GPAs, certificates
-3. **Work Experience** - Companies, positions, responsibilities, achievements
-4. **Projects** - Personal/professional projects with links, technologies
-5. **Hobbies** - Personal interests
-6. **Skills** - Technical and professional skills
+### Deploy to GitHub Pages (Free)
 
-## File Upload Features
+1. Fork this repository
+2. Go to Settings → Pages
+3. Set source to "GitHub Actions"
+4. Push to main branch - automatic deployment!
 
-### Profile Image
-- Supported formats: JPG, PNG, GIF, WebP
-- Max size: 2MB
-- Displayed in resume header
+### Deploy to Vercel (Recommended)
 
-### Project Screenshots (Optional)
-- Can be added to showcase projects
-- Stored in `projects` bucket
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/resume-artisan)
 
-### Certificate Images (Optional)
-- Can be added to education/certifications
-- Stored in `certificates` bucket
+### Deploy to Netlify
 
-## Building for Production
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/yourusername/resume-artisan)
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+Quick start:
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+### Development Workflow
 
 ```bash
-npm run build
+# Create a new branch
+git checkout -b feature/your-feature-name
+
+# Make changes and commit
+git add .
+git commit -m "Add: description of changes"
+
+# Push and create PR
+git push origin feature/your-feature-name
 ```
 
-To start the production server:
-```bash
-npm start
-```
+## 📝 Code of Conduct
 
-## Environment Variables
+This project follows the [Contributor Covenant Code of Conduct](./CODE_OF_CONDUCT.md).
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | Yes |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key | Yes |
+## 📄 License
 
-## Database Schema
+MIT License - see [LICENSE](./LICENSE) file for details.
 
-All tables use:
-- **UUID** for primary keys
-- **user_id** for linking data to users
-- **created_at** and **updated_at** timestamps
-- **Row Level Security (RLS)** policies for data protection
-- **Foreign key constraints** with CASCADE delete
+## 🙏 Acknowledgments
 
-See `supabase/migrations/001_initial_schema.sql` for complete schema.
-
-## Customization
-
-### Colors
-
-The app uses Tailwind CSS with custom gradients. Each form section has its own color theme:
-
-| Section | Colors |
-|---------|--------|
-| Personal | Teal → Cyan |
-| Education | Purple → Pink |
-| Experience | Amber → Orange |
-| Projects | Emerald → Teal |
-| Hobbies | Pink → Rose |
-| Skills | Blue → Indigo |
-
-### Fonts
-
-Fonts are configured in `app/fonts.ts`. The app uses:
-- Inter (body text)
-- Roboto Mono (headings)
-
-## Browser Support
-
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-
-## Troubleshooting
-
-### "Supabase URL and Anon Key are required"
-Make sure your `.env.local` file is properly set up and restart the dev server.
-
-### "Permission denied for table"
-The RLS policies might not be applied. Re-run the migration SQL.
-
-### "Bucket not found" when uploading files
-Ensure storage buckets are created in Supabase Storage.
-
-### Profile image doesn't display
-Check that:
-1. The `profiles` bucket is set to Public
-2. The image URL is being saved to `personal_details.profile_image_url`
-
-## License
-
-This project is licensed under the MIT License.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Support
-
-If you found this project helpful, please consider giving it a ⭐ on GitHub!
+- [shadcn/ui](https://ui.shadcn.com/) for beautiful UI components
+- [Lucide](https://lucide.dev/) for icons
+- [Tailwind CSS](https://tailwindcss.com/) for styling
 
 ---
 
-Made with ❤️ by [Raju Sharma](https://rajusarma.com.np/)
+Built with ❤️ for job seekers everywhere.
+
+[Report Bug](https://github.com/yourusername/resume-artisan/issues) · [Request Feature](https://github.com/yourusername/resume-artisan/issues)
