@@ -1,5 +1,8 @@
+"use client";
+
 import React, { useEffect } from "react";
-import { Transition } from "@headlessui/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle2, X } from "lucide-react";
 
 interface SuccessMessageToastProps {
   message: string;
@@ -16,27 +19,37 @@ const SuccessMessageToast: React.FC<SuccessMessageToastProps> = ({
     if (isVisible) {
       const timer = setTimeout(() => {
         onClose();
-      }, 3500);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [isVisible, onClose]);
 
   return (
-    <Transition
-      appear
-      show={isVisible}
-      enter="transition-opacity duration-300"
-      enterFrom="opacity-0"
-      enterTo="opacity-100"
-      leave="transition-opacity duration-300"
-      leaveFrom="opacity-100"
-      leaveTo="opacity-0"
-    >
-      <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-4 rounded-md shadow-md">
-        <p>{message}</p>
-      </div>
-    </Transition>
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          initial={{ opacity: 0, y: -50, x: "-50%" }}
+          animate={{ opacity: 1, y: 0, x: "-50%" }}
+          exit={{ opacity: 0, y: -50, x: "-50%" }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="fixed top-6 left-1/2 z-50"
+        >
+          <div className="flex items-center gap-3 bg-white text-gray-900 px-6 py-4 rounded-xl shadow-xl shadow-gray-200/50 border border-gray-100">
+            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+            </div>
+            <p className="font-medium">{message}</p>
+            <button
+              onClick={onClose}
+              className="ml-2 p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
-export default SuccessMessageToast
+export default SuccessMessageToast;
