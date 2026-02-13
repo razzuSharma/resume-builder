@@ -18,9 +18,12 @@ import {
   ZoomIn,
   ZoomOut,
   LayoutTemplate,
+  AlertTriangle,
+  Gauge,
 } from "lucide-react";
 import ModernTemplate from "../components/resume-templates/ModernTemplate";
 import ClassicTemplate from "../components/resume-templates/ClassicTemplate";
+import { CompactTemplate, ExecutiveTemplate, MinimalTemplate } from "../components/resume-templates/ExtendedTemplates";
 import DataManager from "../components/DataManager";
 import { useTheme, type ColorVariant } from "../components/ThemeProvider";
 import {
@@ -29,9 +32,11 @@ import {
   loadExperienceDetails,
   loadVolunteerDetails,
   loadProjectDetails,
+  loadJobTarget,
   loadSkills,
   loadHobbies,
 } from "../lib/storage";
+import { TEMPLATE_OPTIONS, getTemplateById, getRecommendedTemplate, type TemplateId } from "../lib/templates";
 
 const colorVariants: { id: ColorVariant; name: string; hex: string }[] = [
   { id: "slate", name: "Slate", hex: "#334155" },
@@ -41,11 +46,6 @@ const colorVariants: { id: ColorVariant; name: string; hex: string }[] = [
   { id: "forest", name: "Forest", hex: "#15803d" },
   { id: "violet", name: "Violet", hex: "#7c3aed" },
 ];
-
-const templates = [
-  { id: "modern", name: "Modern", description: "Two-column with sidebar" },
-  { id: "classic", name: "Classic", description: "Traditional single-column" },
-] as const;
 
 interface ResumeData {
   personal_details: any[];
@@ -77,9 +77,11 @@ const ResumePage: React.FC = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [pdfGenerated, setPdfGenerated] = useState(false);
   const [showColorMenu, setShowColorMenu] = useState(false);
-  const [showTemplateMenu, setShowTemplateMenu] = useState(false);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showDataManager, setShowDataManager] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<"modern" | "classic">("classic");
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("classic");
+  const [jobTarget, setJobTarget] = useState("general");
+  const [isAtsExpanded, setIsAtsExpanded] = useState(false);
   const [previewScale, setPreviewScale] = useState(1);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ResumeData>({
@@ -97,7 +99,7 @@ const ResumePage: React.FC = () => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target.closest(".color-menu-container")) setShowColorMenu(false);
-      if (!target.closest(".template-menu-container")) setShowTemplateMenu(false);
+      if (!target.closest(".template-picker-container")) setShowTemplatePicker(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -112,6 +114,7 @@ const ResumePage: React.FC = () => {
       const projects = loadProjectDetails();
       const skillsRaw = loadSkills();
       const hobbiesRaw = loadHobbies();
+      const target = loadJobTarget();
 
       setData({
         personal_details: personal ? [personal] : [],
@@ -122,6 +125,7 @@ const ResumePage: React.FC = () => {
         skills: skillsRaw.map((s: string, i: number) => ({ id: i, skill_name: s })),
         hobbies: hobbiesRaw.map((h: string, i: number) => ({ id: i, hobby_name: h })),
       });
+      setJobTarget(target);
       setLoading(false);
     };
 
@@ -155,7 +159,122 @@ const ResumePage: React.FC = () => {
 
   const hasData = data.personal_details.length > 0 || data.education_details.length > 0;
 
-  const TemplateComponent = selectedTemplate === "modern" ? ModernTemplate : ClassicTemplate;
+  const TemplateComponent = (() => {
+    switch (selectedTemplate) {
+      case "modern":
+      case "creative":
+        return ModernTemplate;
+      case "compact":
+        return CompactTemplate;
+      case "executive":
+        return ExecutiveTemplate;
+      case "minimal":
+        return MinimalTemplate;
+      case "classic":
+      default:
+        return ClassicTemplate;
+    }
+  })();
+
+  const recommendedTemplate = getRecommendedTemplate(jobTarget);
+
+  const atsReport = React.useMemo(() => {
+    const issues: Array<{ severity: "high" | "medium" | "low"; text: string; action: string }> = [];
+    let score = 100;
+
+    const personal = data.personal_details[0] || {};
+    const hasEmail = !!personal.email;
+    const hasPhone = !!personal.phone;
+    const summaryLength = (personal.summary || "").trim().length;
+    const skillsCount = data.skills.length;
+    const hasEducation = data.education_details.length > 0;
+    const hasExperience = data.experience_details.length > 0 || data.volunteer_details.length > 0;
+
+    const bulletCount =
+      data.experience_details.reduce((sum, exp) => sum + (exp.responsibilities || []).filter((r: string) => r && r.trim()).length, 0) +
+      data.volunteer_details.reduce((sum, v) => sum + (v.contributions || []).filter((c: string) => c && c.trim()).length, 0);
+
+    if (!hasEmail || !hasPhone) {
+      score -= 12;
+      issues.push({
+        severity: "high",
+        text: "Missing critical contact information",
+        action: "Add both email and phone in Personal Details.",
+      });
+    }
+
+    if (summaryLength === 0) {
+      score -= 8;
+      issues.push({
+        severity: "medium",
+        text: "No professional summary found",
+        action: "Add a 2-4 sentence summary tailored to your target role.",
+      });
+    } else if (summaryLength < 60 || summaryLength > 700) {
+      score -= 4;
+      issues.push({
+        severity: "low",
+        text: "Summary length may reduce readability",
+        action: "Keep summary between ~60 and 700 characters.",
+      });
+    }
+
+    if (!hasEducation) {
+      score -= 10;
+      issues.push({
+        severity: "high",
+        text: "Education section is empty",
+        action: "Add at least one education entry.",
+      });
+    }
+
+    if (!hasExperience) {
+      score -= 15;
+      issues.push({
+        severity: "high",
+        text: "No experience or volunteer section content",
+        action: "Add work or volunteer entries with measurable outcomes.",
+      });
+    }
+
+    if (skillsCount < 5) {
+      score -= 10;
+      issues.push({
+        severity: "medium",
+        text: "Skills section is too small",
+        action: "Add at least 5 role-relevant skills.",
+      });
+    } else if (skillsCount > 30) {
+      score -= 3;
+      issues.push({
+        severity: "low",
+        text: "Skills list may be too broad",
+        action: "Prioritize the most relevant 10-20 skills for the role.",
+      });
+    }
+
+    if (bulletCount < 3) {
+      score -= 10;
+      issues.push({
+        severity: "medium",
+        text: "Not enough accomplishment bullets",
+        action: "Add at least 3 achievement/responsibility bullets.",
+      });
+    }
+
+    if (data.project_details.length === 0) {
+      score -= 3;
+      issues.push({
+        severity: "low",
+        text: "No work samples/projects added",
+        action: "Add 1-2 work samples if relevant to your role.",
+      });
+    }
+
+    score = Math.max(0, Math.min(100, score));
+    const level = score >= 85 ? "Strong" : score >= 70 ? "Good" : score >= 55 ? "Fair" : "Needs Work";
+    return { score, level, issues };
+  }, [data]);
 
   if (loading) {
     return (
@@ -220,43 +339,52 @@ const ResumePage: React.FC = () => {
               </button>
             </div>
 
-            {/* Template Selector */}
-            <div className="relative template-menu-container">
+            {/* Template Picker */}
+            <div className="relative template-picker-container">
               <button
-                onClick={() => { setShowTemplateMenu(!showTemplateMenu); setShowColorMenu(false); }}
+                onClick={() => {
+                  setShowTemplatePicker(!showTemplatePicker);
+                  setShowColorMenu(false);
+                }}
                 className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-teal-300 dark:hover:border-teal-500 transition-colors"
               >
                 <LayoutTemplate className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">{selectedTemplate}</span>
-                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showTemplateMenu ? "rotate-180" : ""}`} />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">{getTemplateById(selectedTemplate)?.name || selectedTemplate}</span>
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showTemplatePicker ? "rotate-180" : ""}`} />
               </button>
 
               <AnimatePresence>
-                {showTemplateMenu && (
+                {showTemplatePicker && (
                   <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 p-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 min-w-[180px]"
+                    className="absolute right-0 top-full mt-2 p-3 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 w-[320px] sm:w-[420px]"
                   >
-                    {templates.map((template) => (
-                      <button
-                        key={template.id}
-                        onClick={() => { setSelectedTemplate(template.id); setShowTemplateMenu(false); }}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-left ${
-                          selectedTemplate === template.id ? "bg-teal-50 dark:bg-teal-500/20" : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                        }`}
-                      >
-                        <div className={`w-3 h-3 rounded-full ${selectedTemplate === template.id ? "bg-teal-500" : "bg-gray-300 dark:bg-gray-600"}`} />
-                        <div>
-                          <span className={`text-sm font-medium block ${selectedTemplate === template.id ? "text-teal-700 dark:text-teal-300" : "text-gray-700 dark:text-gray-300"}`}>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {TEMPLATE_OPTIONS.map((template) => (
+                        <button
+                          key={template.id}
+                          onClick={() => {
+                            setSelectedTemplate(template.id);
+                            setShowTemplatePicker(false);
+                          }}
+                          className={`p-2 rounded-lg text-left border transition-colors ${
+                            selectedTemplate === template.id
+                              ? "border-teal-500 bg-teal-50 dark:bg-teal-500/20"
+                              : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                          }`}
+                        >
+                          <p className={`text-sm font-semibold ${selectedTemplate === template.id ? "text-teal-700 dark:text-teal-300" : "text-gray-700 dark:text-gray-200"}`}>
                             {template.name}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">{template.description}</span>
-                        </div>
-                      </button>
-                    ))}
+                          </p>
+                          <p className="text-[11px] mt-1 text-gray-500 dark:text-gray-400 line-clamp-2">
+                            {template.description}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -265,7 +393,10 @@ const ResumePage: React.FC = () => {
             {/* Color Variant Selector */}
             <div className="relative color-menu-container">
               <button
-                onClick={() => { setShowColorMenu(!showColorMenu); setShowTemplateMenu(false); }}
+                onClick={() => {
+                  setShowColorMenu(!showColorMenu);
+                  setShowTemplatePicker(false);
+                }}
                 className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-teal-300 dark:hover:border-teal-500 transition-colors"
               >
                 <Palette className="w-4 h-4 text-gray-500" />
@@ -335,6 +466,97 @@ const ResumePage: React.FC = () => {
           </div>
         </motion.div>
 
+        {/* ATS Readiness Panel */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 print:hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center">
+                <Gauge className="w-5 h-5 text-teal-700 dark:text-teal-300" />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">ATS Readiness</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  {atsReport.score}/100
+                  <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">({atsReport.level})</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="lg:ml-auto text-sm text-gray-600 dark:text-gray-300">
+              Recommended template for your target role:
+              <span className="ml-1 font-semibold text-teal-700 dark:text-teal-300">
+                {getTemplateById(recommendedTemplate)?.name}
+              </span>
+              {selectedTemplate !== recommendedTemplate && (
+                <button
+                  onClick={() => setSelectedTemplate(recommendedTemplate)}
+                  className="ml-3 px-3 py-1.5 rounded-lg bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 hover:bg-teal-200 dark:hover:bg-teal-500/30 transition-colors"
+                >
+                  Apply
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => setIsAtsExpanded((prev) => !prev)}
+              className="lg:ml-4 inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300"
+            >
+              {isAtsExpanded ? "Hide details" : "Show details"}
+              <ChevronDown className={`w-4 h-4 transition-transform ${isAtsExpanded ? "rotate-180" : ""}`} />
+            </button>
+          </div>
+
+          <AnimatePresence initial={false}>
+            {isAtsExpanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                {atsReport.issues.length > 0 ? (
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {atsReport.issues.slice(0, 6).map((issue, idx) => (
+                      <div key={idx} className="rounded-xl border border-gray-200 dark:border-gray-700 p-3">
+                        <div className="flex items-start gap-2">
+                          {issue.severity === "high" ? (
+                            <AlertTriangle className="w-4 h-4 mt-0.5 text-red-500" />
+                          ) : (
+                            <AlertTriangle className="w-4 h-4 mt-0.5 text-amber-500" />
+                          )}
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{issue.text}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{issue.action}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-4 rounded-xl border border-emerald-200 dark:border-emerald-800 p-3 bg-emerald-50/60 dark:bg-emerald-900/20 flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span className="text-sm font-medium">Strong ATS structure. Keep tailoring keywords for each job.</span>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {!isAtsExpanded && atsReport.issues.length > 0 && (
+            <div className="mt-3 text-sm text-gray-600 dark:text-gray-300">
+              Top issues:
+              <span className="ml-1">
+                {atsReport.issues
+                  .slice(0, 2)
+                  .map((issue) => issue.text)
+                  .join(" • ")}
+              </span>
+            </div>
+          )}
+        </motion.div>
+
         {/* 
           PREVIEW SECTION
           - z-10: lower than header (z-30)
@@ -356,7 +578,7 @@ const ResumePage: React.FC = () => {
             <div
               ref={pdfRef}
               id="resume-print-root"
-              className={`resume-paper resume-variant-${colorVariant} bg-white shadow-2xl print:shadow-none`}
+              className={`resume-paper resume-variant-${colorVariant} resume-template-${selectedTemplate} bg-white shadow-2xl print:shadow-none`}
               style={{ width: "210mm", minHeight: "297mm", boxSizing: "border-box" }}
             >
               <TemplateComponent
@@ -367,6 +589,7 @@ const ResumePage: React.FC = () => {
                 skills={data.skills}
                 project_details={data.project_details}
                 hobbies={data.hobbies}
+                variant={selectedTemplate}
               />
             </div>
           </motion.div>
