@@ -10,6 +10,7 @@ import {
   Globe,
   Github,
 } from "lucide-react";
+import type { TemplateId } from "../../lib/templates";
 
 interface ClassicTemplateProps {
   personal_details: any[];
@@ -21,6 +22,7 @@ interface ClassicTemplateProps {
   hobbies: any[];
   certifications?: any[];
   languages?: any[];
+  variant?: TemplateId;
 }
 
 const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
@@ -33,6 +35,7 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
   hobbies,
   certifications,
   languages,
+  variant = "classic",
 }) => {
   const personal = personal_details[0] || {};
 
@@ -86,8 +89,8 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
   const hobbyList = getHobbies();
 
   return (
-    <div 
-      className="classic-resume"
+    <div
+      className={`classic-resume classic-variant-${variant}`}
       style={{
         width: "210mm",
         minHeight: "297mm",

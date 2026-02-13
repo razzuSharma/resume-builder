@@ -34,10 +34,13 @@ import {
   loadExperienceDetails,
   loadVolunteerDetails,
   loadProjectDetails,
+  loadJobTarget,
+  saveJobTarget,
   loadSkills,
   loadHobbies 
 } from "../lib/storage";
 import { useTheme } from "../components/ThemeProvider";
+import { TEMPLATE_OPTIONS, JOB_TARGET_OPTIONS, getRecommendedTemplate, getTemplateById, type TemplateId } from "../lib/templates";
 
 interface Step {
   id: string;
@@ -54,7 +57,8 @@ const ResumePage = () => {
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [showPreview, setShowPreview] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<"modern" | "classic">("classic");
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("classic");
+  const [jobTarget, setJobTarget] = useState("general");
   const [showResumeDataPrompt, setShowResumeDataPrompt] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -139,6 +143,9 @@ const ResumePage = () => {
 
   // Hydrate completed steps from localStorage on mount
   useEffect(() => {
+    const target = loadJobTarget();
+    setJobTarget(target);
+
     // Check which steps have existing data
     const stepsWithData = new Set<number>();
     steps.forEach((step, index) => {
@@ -155,6 +162,8 @@ const ResumePage = () => {
     setIsHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const recommendedTemplate = getRecommendedTemplate(jobTarget);
 
   const handleNext = () => {
     setCompletedSteps((prev) => {
@@ -260,32 +269,62 @@ const ResumePage = () => {
           </p>
         </div>
 
-        {/* Template Selector & Preview Toggle */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8">
-          <div className="flex items-center gap-1 sm:gap-2 bg-white dark:bg-gray-800 rounded-xl p-1 border border-gray-200 dark:border-gray-700">
-            <button
-              onClick={() => setSelectedTemplate("classic")}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                selectedTemplate === "classic"
-                  ? "bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              }`}
-            >
-              <span className="hidden sm:inline">Classic Template</span>
-              <span className="sm:hidden">Classic</span>
-            </button>
-            <button
-              onClick={() => setSelectedTemplate("modern")}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                selectedTemplate === "modern"
-                  ? "bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              }`}
-            >
-              <span className="hidden sm:inline">Modern Template</span>
-              <span className="sm:hidden">Modern</span>
-            </button>
+        {/* Job Target + Template Controls */}
+        <div className="mb-6 sm:mb-8">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-5">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-4 mb-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Job Target</label>
+                <select
+                  value={jobTarget}
+                  onChange={(e) => {
+                    setJobTarget(e.target.value);
+                    saveJobTarget(e.target.value);
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                >
+                  {JOB_TARGET_OPTIONS.map((target) => (
+                    <option key={target.id} value={target.id}>{target.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="lg:w-80">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Recommended template:
+                  <span className="ml-1 font-semibold text-teal-700 dark:text-teal-300">
+                    {getTemplateById(recommendedTemplate)?.name}
+                  </span>
+                </p>
+                <button
+                  onClick={() => setSelectedTemplate(recommendedTemplate)}
+                  className="mt-2 px-3 py-2 text-sm rounded-xl bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 hover:bg-teal-200 dark:hover:bg-teal-500/30 transition-colors"
+                >
+                  Use Recommended
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {TEMPLATE_OPTIONS.map((template) => (
+                <button
+                  key={template.id}
+                  onClick={() => setSelectedTemplate(template.id)}
+                  className={`text-left p-3 rounded-xl border transition-colors ${
+                    selectedTemplate === template.id
+                      ? "border-teal-500 bg-teal-50 dark:bg-teal-500/10"
+                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/40"
+                  }`}
+                >
+                  <p className="font-semibold text-gray-900 dark:text-white">{template.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{template.description}</p>
+                </button>
+              ))}
+            </div>
           </div>
+        </div>
+
+        {/* Preview + Export */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8">
 
           {!isMobile && (
             <button

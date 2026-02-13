@@ -58,6 +58,79 @@
     "Apple Color Emoji", "Segoe UI Emoji";
 }
 
+/* ============================================
+   TEMPLATE VARIANTS
+   Ensures each template option has a visibly distinct style.
+   ============================================ */
+
+.resume-template-compact .classic-resume {
+  padding: 11mm 14mm !important;
+  font-size: 10pt !important;
+  line-height: 1.35 !important;
+}
+
+.resume-template-compact .classic-resume h1 {
+  font-size: 20pt !important;
+}
+
+.resume-template-compact .classic-resume h2 {
+  font-size: 11pt !important;
+  margin-bottom: 2mm !important;
+}
+
+.resume-template-minimal .classic-resume {
+  padding: 17mm 20mm !important;
+  font-family: "Source Serif 4", ui-serif, Georgia, "Times New Roman", Times, serif !important;
+}
+
+.resume-template-minimal .classic-resume h1 {
+  letter-spacing: 0.02em !important;
+}
+
+.resume-template-minimal .classic-resume h2 {
+  text-transform: none !important;
+  letter-spacing: 0.03em !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+}
+
+.resume-template-executive .modern-resume {
+  --resume-accent: #0f172a;
+  --resume-accent-dark: #1e293b;
+  --resume-accent-light: #475569;
+}
+
+.resume-template-executive .modern-resume .sidebar {
+  width: 62mm !important;
+  padding: 10mm 4.5mm 9mm 4.5mm !important;
+  background: linear-gradient(180deg, #0b1324 0%, #1e293b 100%) !important;
+}
+
+.resume-template-executive .modern-resume .main-content {
+  width: 148mm !important;
+  padding: 10mm 7mm 9mm 7mm !important;
+}
+
+.resume-template-executive .modern-resume h2 {
+  letter-spacing: 0.06em !important;
+}
+
+.resume-template-creative .modern-resume {
+  --resume-accent: #7c3aed;
+  --resume-accent-dark: #4f46e5;
+  --resume-accent-light: #ec4899;
+}
+
+.resume-template-creative .modern-resume .sidebar {
+  width: 74mm !important;
+  padding: 13mm 5.5mm 10mm 5.5mm !important;
+  background: linear-gradient(180deg, #7c3aed 0%, #2563eb 50%, #0ea5e9 100%) !important;
+}
+
+.resume-template-creative .modern-resume .main-content {
+  width: 136mm !important;
+  padding: 13mm 7mm 10mm 7mm !important;
+}
+
 /* Slate Variant */
 .app-accent-slate,
 .resume-variant-slate {

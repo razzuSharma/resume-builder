@@ -10,6 +10,7 @@ import {
   Globe,
   Github,
 } from "lucide-react";
+import type { TemplateId } from "../../lib/templates";
 
 interface ModernTemplateProps {
   personal_details: any[];
@@ -21,6 +22,7 @@ interface ModernTemplateProps {
   hobbies: any[];
   certifications?: any[];
   languages?: any[];
+  variant?: TemplateId;
 }
 
 /**
@@ -44,6 +46,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
   hobbies,
   certifications,
   languages,
+  variant = "modern",
 }) => {
   const personal = personal_details[0] || {};
 
@@ -98,7 +101,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
 
   return (
     <div 
-      className="modern-resume"
+      className={`modern-resume modern-variant-${variant}`}
       style={{
         // Exact A4 dimensions
         width: "210mm",
@@ -367,6 +370,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
 
         {/* Main Content - 140mm exact (2/3 of 210mm) */}
         <main
+          className="main-content"
           style={{
             width: "140mm",
             minHeight: "297mm",

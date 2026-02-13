@@ -5,13 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Eye, EyeOff, Maximize2, Minimize2, GripVertical } from "lucide-react";
 import ModernTemplate from "./resume-templates/ModernTemplate";
 import ClassicTemplate from "./resume-templates/ClassicTemplate";
+import { CompactTemplate, ExecutiveTemplate, MinimalTemplate } from "./resume-templates/ExtendedTemplates";
 import { useTheme, type ColorVariant } from "./ThemeProvider";
 import { notifyResumeUpdate } from "../lib/storage";
+import type { TemplateId } from "../lib/templates";
 
 interface LivePreviewProps {
   isOpen: boolean;
   onClose: () => void;
-  template?: "modern" | "classic";
+  template?: TemplateId;
   colorVariant?: ColorVariant;
 }
 
@@ -167,7 +169,22 @@ const LivePreview: React.FC<LivePreviewProps> = ({ isOpen, onClose, template = "
     );
   }
 
-  const TemplateComponent = template === "classic" ? ClassicTemplate : ModernTemplate;
+  const TemplateComponent = (() => {
+    switch (template) {
+      case "modern":
+      case "creative":
+        return ModernTemplate;
+      case "compact":
+        return CompactTemplate;
+      case "executive":
+        return ExecutiveTemplate;
+      case "minimal":
+        return MinimalTemplate;
+      case "classic":
+      default:
+        return ClassicTemplate;
+    }
+  })();
 
   // Calculate scale based on panel width and A4 width (210mm ≈ 794px at 96dpi)
   const A4_WIDTH_PX = 794;
@@ -260,7 +277,7 @@ const LivePreview: React.FC<LivePreviewProps> = ({ isOpen, onClose, template = "
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              className="bg-white shadow-2xl"
+              className={`bg-white shadow-2xl resume-template-${template}`}
               style={{ 
                 width: isMobile ? "100%" : "210mm",
                 minHeight: isMobile ? "auto" : "297mm",
@@ -282,6 +299,7 @@ const LivePreview: React.FC<LivePreviewProps> = ({ isOpen, onClose, template = "
                   project_details={resumeData.projects}
                   skills={resumeData.skills.map((s, i) => ({ id: i, skill_name: s }))}
                   hobbies={resumeData.hobbies.map((h, i) => ({ id: i, hobby_name: h }))}
+                  variant={template}
                 />
               </div>
             </motion.div>
