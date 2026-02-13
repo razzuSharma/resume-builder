@@ -16,6 +16,18 @@
   --ring: #0d9488;
   --muted: #64748b;
   --accent: #0d9488;
+  --app-accent: #0f766e;
+  --app-accent-dark: #115e59;
+  --app-accent-light: #14b8a6;
+  --app-accent-50: #f0fdfa;
+  --app-accent-100: #ccfbf1;
+  --app-accent-200: #99f6e4;
+  --app-accent-300: #5eead4;
+  --app-accent-400: #2dd4bf;
+  --app-accent-500: #14b8a6;
+  --app-accent-600: #0d9488;
+  --app-accent-700: #0f766e;
+  --app-accent-900: #134e4a;
 }
 
 .dark {
@@ -47,46 +59,198 @@
 }
 
 /* Slate Variant */
+.app-accent-slate,
 .resume-variant-slate {
+  --app-accent: #334155;
+  --app-accent-dark: #1e293b;
+  --app-accent-light: #64748b;
+  --app-accent-50: #f8fafc;
+  --app-accent-100: #f1f5f9;
+  --app-accent-200: #e2e8f0;
+  --app-accent-300: #cbd5e1;
+  --app-accent-400: #94a3b8;
+  --app-accent-500: #64748b;
+  --app-accent-600: #475569;
+  --app-accent-700: #334155;
+  --app-accent-900: #0f172a;
   --resume-accent: #334155;
   --resume-accent-dark: #1e293b;
   --resume-accent-light: #64748b;
 }
 
 /* Teal Variant */
+.app-accent-teal,
 .resume-variant-teal {
+  --app-accent: #0f766e;
+  --app-accent-dark: #115e59;
+  --app-accent-light: #14b8a6;
+  --app-accent-50: #f0fdfa;
+  --app-accent-100: #ccfbf1;
+  --app-accent-200: #99f6e4;
+  --app-accent-300: #5eead4;
+  --app-accent-400: #2dd4bf;
+  --app-accent-500: #14b8a6;
+  --app-accent-600: #0d9488;
+  --app-accent-700: #0f766e;
+  --app-accent-900: #134e4a;
   --resume-accent: #0f766e;
   --resume-accent-dark: #115e59;
   --resume-accent-light: #14b8a6;
 }
 
 /* Navy Variant */
+.app-accent-navy,
 .resume-variant-navy {
+  --app-accent: #1e40af;
+  --app-accent-dark: #1e3a8a;
+  --app-accent-light: #3b82f6;
+  --app-accent-50: #eff6ff;
+  --app-accent-100: #dbeafe;
+  --app-accent-200: #bfdbfe;
+  --app-accent-300: #93c5fd;
+  --app-accent-400: #60a5fa;
+  --app-accent-500: #3b82f6;
+  --app-accent-600: #2563eb;
+  --app-accent-700: #1d4ed8;
+  --app-accent-900: #1e3a8a;
   --resume-accent: #1e40af;
   --resume-accent-dark: #1e3a8a;
   --resume-accent-light: #3b82f6;
 }
 
 /* Rose Variant */
+.app-accent-rose,
 .resume-variant-rose {
+  --app-accent: #be123c;
+  --app-accent-dark: #9f1239;
+  --app-accent-light: #f43f5e;
+  --app-accent-50: #fff1f2;
+  --app-accent-100: #ffe4e6;
+  --app-accent-200: #fecdd3;
+  --app-accent-300: #fda4af;
+  --app-accent-400: #fb7185;
+  --app-accent-500: #f43f5e;
+  --app-accent-600: #e11d48;
+  --app-accent-700: #be123c;
+  --app-accent-900: #881337;
   --resume-accent: #be123c;
   --resume-accent-dark: #9f1239;
   --resume-accent-light: #f43f5e;
 }
 
 /* Forest Variant */
+.app-accent-forest,
 .resume-variant-forest {
+  --app-accent: #166534;
+  --app-accent-dark: #14532d;
+  --app-accent-light: #22c55e;
+  --app-accent-50: #f0fdf4;
+  --app-accent-100: #dcfce7;
+  --app-accent-200: #bbf7d0;
+  --app-accent-300: #86efac;
+  --app-accent-400: #4ade80;
+  --app-accent-500: #22c55e;
+  --app-accent-600: #16a34a;
+  --app-accent-700: #15803d;
+  --app-accent-900: #14532d;
   --resume-accent: #166534;
   --resume-accent-dark: #14532d;
   --resume-accent-light: #22c55e;
 }
 
 /* Violet Variant */
+.app-accent-violet,
 .resume-variant-violet {
+  --app-accent: #6d28d9;
+  --app-accent-dark: #5b21b6;
+  --app-accent-light: #a78bfa;
+  --app-accent-50: #f5f3ff;
+  --app-accent-100: #ede9fe;
+  --app-accent-200: #ddd6fe;
+  --app-accent-300: #c4b5fd;
+  --app-accent-400: #a78bfa;
+  --app-accent-500: #8b5cf6;
+  --app-accent-600: #7c3aed;
+  --app-accent-700: #6d28d9;
+  --app-accent-900: #4c1d95;
   --resume-accent: #6d28d9;
   --resume-accent-dark: #5b21b6;
   --resume-accent-light: #a78bfa;
 }
+
+/* ============================================
+   APP ACCENT COLOR MAPPING
+   Maps existing teal/cyan utility usage to the selected color variant.
+   ============================================ */
+
+.from-teal-500,
+.from-teal-600,
+.dark\:from-teal-400 {
+  --tw-gradient-from: var(--app-accent-600) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-teal-700 {
+  --tw-gradient-from: var(--app-accent-700) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-cyan-500,
+.to-cyan-600,
+.dark\:to-cyan-400 {
+  --tw-gradient-to: var(--app-accent-light) var(--tw-gradient-to-position);
+}
+
+.to-cyan-700 {
+  --tw-gradient-to: var(--app-accent-dark) var(--tw-gradient-to-position);
+}
+
+.bg-teal-50 { background-color: var(--app-accent-50) !important; }
+.bg-teal-100 { background-color: var(--app-accent-100) !important; }
+.bg-teal-500 { background-color: var(--app-accent-500) !important; }
+.bg-teal-600 { background-color: var(--app-accent-600) !important; }
+.bg-cyan-600 { background-color: var(--app-accent-light) !important; }
+
+.text-teal-500 { color: var(--app-accent-500) !important; }
+.text-teal-600 { color: var(--app-accent-600) !important; }
+.text-teal-700 { color: var(--app-accent-700) !important; }
+.text-teal-800 { color: var(--app-accent-700) !important; }
+.text-cyan-600 { color: var(--app-accent-light) !important; }
+
+.border-teal-100 { border-color: var(--app-accent-100) !important; }
+.border-teal-200 { border-color: var(--app-accent-200) !important; }
+.border-teal-300 { border-color: var(--app-accent-300) !important; }
+.border-teal-400 { border-color: var(--app-accent-400) !important; }
+.border-teal-500 { border-color: var(--app-accent-500) !important; }
+
+.ring-teal-500 { --tw-ring-color: var(--app-accent-500) !important; }
+
+.fill-teal-500,
+.fill-teal-600 { fill: var(--app-accent-600) !important; }
+
+.dark .dark\:text-teal-300 { color: var(--app-accent-300) !important; }
+.dark .dark\:text-teal-400 { color: var(--app-accent-400) !important; }
+.dark .dark\:fill-teal-400,
+.dark .dark\:fill-teal-500 { fill: var(--app-accent-400) !important; }
+
+.dark .dark\:bg-teal-500\/10 { background-color: color-mix(in srgb, var(--app-accent-500) 10%, transparent) !important; }
+.dark .dark\:bg-teal-500\/20 { background-color: color-mix(in srgb, var(--app-accent-500) 20%, transparent) !important; }
+.dark .dark\:bg-teal-900\/30 { background-color: color-mix(in srgb, var(--app-accent-900) 30%, transparent) !important; }
+.dark .dark\:border-teal-500\/20 { border-color: color-mix(in srgb, var(--app-accent-500) 20%, transparent) !important; }
+
+.hover\:bg-teal-50:hover { background-color: var(--app-accent-50) !important; }
+.hover\:bg-teal-100:hover { background-color: var(--app-accent-100) !important; }
+.hover\:text-teal-600:hover { color: var(--app-accent-600) !important; }
+.hover\:text-teal-700:hover { color: var(--app-accent-700) !important; }
+.hover\:border-teal-300:hover { border-color: var(--app-accent-300) !important; }
+.hover\:border-teal-400:hover { border-color: var(--app-accent-400) !important; }
+
+.dark .dark\:hover\:text-teal-300:hover { color: var(--app-accent-300) !important; }
+.dark .dark\:hover\:text-teal-400:hover { color: var(--app-accent-400) !important; }
+.dark .dark\:hover\:border-teal-500:hover { border-color: var(--app-accent-500) !important; }
+.dark .dark\:hover\:border-teal-500\/50:hover { border-color: color-mix(in srgb, var(--app-accent-500) 50%, transparent) !important; }
 
 /* Serif variant override */
 .resume-variant-navy,

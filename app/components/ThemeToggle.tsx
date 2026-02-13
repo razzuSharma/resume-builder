@@ -5,16 +5,16 @@ import { Sun, Moon, Palette } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 
 const colorVariants = [
-  { id: "slate", name: "Slate", color: "bg-slate-600" },
-  { id: "teal", name: "Teal", color: "bg-teal-600" },
-  { id: "navy", name: "Navy", color: "bg-blue-700" },
-  { id: "rose", name: "Rose", color: "bg-rose-600" },
-  { id: "forest", name: "Forest", color: "bg-green-700" },
-  { id: "violet", name: "Violet", color: "bg-violet-600" },
+  { id: "slate", name: "Slate", hex: "#334155" },
+  { id: "teal", name: "Teal", hex: "#0d9488" },
+  { id: "navy", name: "Navy", hex: "#1d4ed8" },
+  { id: "rose", name: "Rose", hex: "#e11d48" },
+  { id: "forest", name: "Forest", hex: "#15803d" },
+  { id: "violet", name: "Violet", hex: "#7c3aed" },
 ] as const;
 
 export function ThemeToggle() {
-  const { theme, colorVariant, toggleTheme, setColorVariant, isDark } = useTheme();
+  const { appAccentVariant, toggleTheme, setAppAccentVariant, isDark } = useTheme();
   const [showColorPicker, setShowColorPicker] = React.useState(false);
 
   return (
@@ -24,7 +24,7 @@ export function ThemeToggle() {
         <button
           onClick={() => setShowColorPicker(!showColorPicker)}
           className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-          aria-label="Change color theme"
+          aria-label="Change app accent color"
         >
           <Palette className="w-5 h-5" />
         </button>
@@ -37,28 +37,29 @@ export function ThemeToggle() {
             />
             <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 p-3">
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
-                Resume Theme
+                App Accent
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {colorVariants.map((variant) => (
                   <button
                     key={variant.id}
                     onClick={() => {
-                      setColorVariant(variant.id as any);
+                      setAppAccentVariant(variant.id);
                       setShowColorPicker(false);
                     }}
                     className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
-                      colorVariant === variant.id
+                      appAccentVariant === variant.id
                         ? "bg-gray-100 dark:bg-gray-700 ring-2 ring-teal-500"
                         : "hover:bg-gray-50 dark:hover:bg-gray-700"
                     }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-full ${variant.color} ${
-                        colorVariant === variant.id
+                      className={`w-6 h-6 rounded-full ${
+                        appAccentVariant === variant.id
                           ? "ring-2 ring-offset-2 ring-gray-400 dark:ring-offset-gray-800"
                           : ""
                       }`}
+                      style={{ backgroundColor: variant.hex }}
                     />
                     <span className="text-[10px] text-gray-600 dark:text-gray-300">
                       {variant.name}

@@ -12,8 +12,10 @@ const STORAGE_KEYS = {
   PERSONAL_DETAILS: 'resume_personal_details',
   EDUCATION_DETAILS: 'resume_education_details',
   EXPERIENCE_DETAILS: 'resume_experience_details',
+  VOLUNTEER_DETAILS: 'resume_volunteer_details',
   PROJECT_DETAILS: 'resume_project_details',
   SKILLS: 'resume_skills',
+  JOB_TARGET: 'resume_job_target',
   HOBBIES: 'resume_hobbies',
   THEME: 'theme',
   COLOR_VARIANT: 'colorVariant',
@@ -97,6 +99,17 @@ export const clearExperienceDetails = (): void => {
   localStorage.removeItem(STORAGE_KEYS.EXPERIENCE_DETAILS);
 };
 
+export const saveVolunteerDetails = (data: unknown[]) => 
+  saveToStorage(STORAGE_KEYS.VOLUNTEER_DETAILS, data);
+
+export const loadVolunteerDetails = () => 
+  loadFromStorage(STORAGE_KEYS.VOLUNTEER_DETAILS, []);
+
+export const clearVolunteerDetails = (): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(STORAGE_KEYS.VOLUNTEER_DETAILS);
+};
+
 export const saveProjectDetails = (data: unknown[]) => 
   saveToStorage(STORAGE_KEYS.PROJECT_DETAILS, data);
 
@@ -117,6 +130,17 @@ export const loadSkills = () =>
 export const clearSkills = (): void => {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(STORAGE_KEYS.SKILLS);
+};
+
+export const saveJobTarget = (data: string) =>
+  saveToStorage(STORAGE_KEYS.JOB_TARGET, data);
+
+export const loadJobTarget = () =>
+  loadFromStorage(STORAGE_KEYS.JOB_TARGET, "general");
+
+export const clearJobTarget = (): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(STORAGE_KEYS.JOB_TARGET);
 };
 
 export const saveHobbies = (data: string[]) => 
@@ -140,8 +164,10 @@ export interface ExportedResumeData {
   personal: unknown;
   education: unknown[];
   experience: unknown[];
+  volunteer?: unknown[];
   projects: unknown[];
   skills: string[];
+  jobTarget?: string;
   hobbies: string[];
 }
 
@@ -155,8 +181,10 @@ export const exportResumeData = (): ExportedResumeData => {
     personal: loadPersonalDetails(),
     education: loadEducationDetails(),
     experience: loadExperienceDetails(),
+    volunteer: loadVolunteerDetails(),
     projects: loadProjectDetails(),
     skills: loadSkills(),
+    jobTarget: loadJobTarget(),
     hobbies: loadHobbies(),
   };
 };
@@ -170,8 +198,10 @@ export const importResumeData = (data: ExportedResumeData): boolean => {
     if (data.personal) savePersonalDetails(data.personal);
     if (data.education) saveEducationDetails(data.education);
     if (data.experience) saveExperienceDetails(data.experience);
+    if (data.volunteer) saveVolunteerDetails(data.volunteer);
     if (data.projects) saveProjectDetails(data.projects);
     if (data.skills) saveSkills(data.skills);
+    if (data.jobTarget) saveJobTarget(data.jobTarget);
     if (data.hobbies) saveHobbies(data.hobbies);
     notifyResumeUpdate();
     return true;
