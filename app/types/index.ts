@@ -55,6 +55,21 @@ export interface Experience {
   updated_at?: string;
 }
 
+// Volunteer Experience
+export interface VolunteerExperience {
+  id?: string;
+  user_id: string;
+  organization_name: string;
+  role: string;
+  location?: string;
+  start_date: string;
+  end_date?: string | null;
+  present: boolean;
+  contributions: string[];
+  created_at?: string;
+  updated_at?: string;
+}
+
 // Project
 export interface Project {
   id?: string;
@@ -65,7 +80,9 @@ export interface Project {
   present: boolean;
   link?: string;
   github_link?: string;
+  role?: string;
   description: string;
+  outcome?: string;
   technologies?: string[];
   project_image_url?: string;
   created_at?: string;
@@ -125,6 +142,7 @@ export interface ResumeData {
   personal_details: PersonalDetails[];
   education_details: Education[];
   experience_details: Experience[];
+  volunteer_details?: VolunteerExperience[];
   project_details: Project[];
   skills: Skills[];
   hobbies: Hobbies[];

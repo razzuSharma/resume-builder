@@ -4,12 +4,15 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 export type ColorVariant = "slate" | "teal" | "navy" | "rose" | "forest" | "violet";
+export type AppAccentVariant = ColorVariant;
 
 interface ThemeContextType {
   theme: Theme;
   colorVariant: ColorVariant;
+  appAccentVariant: AppAccentVariant;
   toggleTheme: () => void;
   setColorVariant: (variant: ColorVariant) => void;
+  setAppAccentVariant: (variant: AppAccentVariant) => void;
   isDark: boolean;
 }
 
@@ -18,6 +21,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   const [colorVariant, setColorVariant] = useState<ColorVariant>("slate");
+  const [appAccentVariant, setAppAccentVariant] = useState<AppAccentVariant>("teal");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -25,6 +29,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Check local storage for saved theme
     const savedTheme = localStorage.getItem("theme") as Theme;
     const savedVariant = localStorage.getItem("colorVariant") as ColorVariant;
+    const savedAppAccent = localStorage.getItem("appAccentVariant") as AppAccentVariant;
     
     if (savedTheme) {
       setTheme(savedTheme);
@@ -36,6 +41,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     if (savedVariant) {
       setColorVariant(savedVariant);
+    }
+
+    // App accent has independent storage, fallback to old colorVariant for migration
+    if (savedAppAccent) {
+      setAppAccentVariant(savedAppAccent);
+    } else if (savedVariant) {
+      setAppAccentVariant(savedVariant);
     }
   }, []);
 
@@ -53,21 +65,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.classList.remove("dark");
     }
     
-    // Apply color variant class to body for resume styling
+    // Apply app accent class to body for overall UI styling
     document.body.classList.remove(
-      "resume-variant-slate",
-      "resume-variant-teal", 
-      "resume-variant-navy",
-      "resume-variant-rose",
-      "resume-variant-forest",
-      "resume-variant-violet"
+      "app-accent-slate",
+      "app-accent-teal",
+      "app-accent-navy",
+      "app-accent-rose",
+      "app-accent-forest",
+      "app-accent-violet"
     );
-    document.body.classList.add(`resume-variant-${colorVariant}`);
+    document.body.classList.add(`app-accent-${appAccentVariant}`);
     
     // Save to local storage
     localStorage.setItem("theme", theme);
     localStorage.setItem("colorVariant", colorVariant);
-  }, [theme, colorVariant, mounted]);
+    localStorage.setItem("appAccentVariant", appAccentVariant);
+  }, [theme, colorVariant, appAccentVariant, mounted]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
@@ -78,8 +91,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       value={{
         theme,
         colorVariant,
+        appAccentVariant,
         toggleTheme,
         setColorVariant,
+        setAppAccentVariant,
         isDark: theme === "dark",
       }}
     >

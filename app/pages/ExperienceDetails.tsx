@@ -333,18 +333,8 @@ const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
       // Generate stable IDs for saved experiences
       setExperienceIds(savedData.map(() => generateExperienceId()));
     } else {
-      const defaultExperience = {
-        company_name: "",
-        position: "",
-        location: "",
-        start_date: "",
-        end_date: "",
-        present: false,
-        responsibilities: [""],
-        achievements: [],
-      };
-      setInitialValues({ experiences: [defaultExperience] });
-      setExperienceIds([generateExperienceId()]);
+      setInitialValues({ experiences: [] });
+      setExperienceIds([]);
     }
     setIsLoading(false);
   }, []);
@@ -418,7 +408,7 @@ const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Work Experience</h2>
         </div>
         <p className="text-gray-600 dark:text-gray-300">
-          Add your work history. Highlight your achievements and responsibilities.
+          Add your work history if you have it. You can skip this section.
         </p>
       </div>
 
@@ -447,7 +437,7 @@ const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
                           setExpandedIndex(expandedIndex === index ? -1 : index)
                         }
                         onRemove={() => handleRemoveExperience(remove, index, values)}
-                        canRemove={values.experiences.length > 1}
+                        canRemove={values.experiences.length > 0}
                         experienceId={experienceIds[index] || String(index)}
                       />
                     ))}
@@ -475,19 +465,10 @@ const ExperienceDetails: React.FC<ExperienceDetailsProps> = ({ onNext }) => {
                 onClick={() => {
                   clearExperienceDetails();
                   setValues({
-                    experiences: [{
-                      company_name: "",
-                      position: "",
-                      location: "",
-                      start_date: "",
-                      end_date: "",
-                      present: false,
-                      responsibilities: [""],
-                      achievements: [],
-                    }],
+                    experiences: [],
                   });
-                  setExperienceIds([generateExperienceId()]);
-                  setExpandedIndex(0);
+                  setExperienceIds([]);
+                  setExpandedIndex(-1);
                 }}
                 className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
               >

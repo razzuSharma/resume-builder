@@ -21,6 +21,7 @@ const useResumeData = () => {
     personal: null as any,
     education: [] as any[],
     experience: [] as any[],
+    volunteer: [] as any[],
     projects: [] as any[],
     skills: [] as string[],
     hobbies: [] as string[],
@@ -32,6 +33,7 @@ const useResumeData = () => {
     const personal = localStorage.getItem("resume_personal_details");
     const education = localStorage.getItem("resume_education_details");
     const experience = localStorage.getItem("resume_experience_details");
+    const volunteer = localStorage.getItem("resume_volunteer_details");
     const projects = localStorage.getItem("resume_project_details");
     const skills = localStorage.getItem("resume_skills");
     const hobbies = localStorage.getItem("resume_hobbies");
@@ -40,6 +42,7 @@ const useResumeData = () => {
       personal: personal ? JSON.parse(personal) : null,
       education: education ? JSON.parse(education) : [],
       experience: experience ? JSON.parse(experience) : [],
+      volunteer: volunteer ? JSON.parse(volunteer) : [],
       projects: projects ? JSON.parse(projects) : [],
       skills: skills ? JSON.parse(skills) : [],
       hobbies: hobbies ? JSON.parse(hobbies) : [],
@@ -275,6 +278,7 @@ const LivePreview: React.FC<LivePreviewProps> = ({ isOpen, onClose, template = "
                   personal_details={resumeData.personal ? [resumeData.personal] : []}
                   education_details={resumeData.education}
                   experience_details={resumeData.experience}
+                  volunteer_details={resumeData.volunteer}
                   project_details={resumeData.projects}
                   skills={resumeData.skills.map((s, i) => ({ id: i, skill_name: s }))}
                   hobbies={resumeData.hobbies.map((h, i) => ({ id: i, hobby_name: h }))}

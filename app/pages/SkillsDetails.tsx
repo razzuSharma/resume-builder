@@ -13,22 +13,39 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { skillsSchema } from "../utils/validationSchemas";
-import { saveSkills, loadSkills, clearSkills, notifyResumeUpdate } from "../lib/storage";
+import { saveSkills, loadSkills, clearSkills, notifyResumeUpdate, loadJobTarget, saveJobTarget, clearJobTarget } from "../lib/storage";
 
 interface SkillsDetailsProps {
   onNext: () => void;
 }
 
-const suggestedSkills = [
-  "JavaScript", "TypeScript", "React", "Next.js", "Node.js", "Python",
-  "SQL", "Git", "AWS", "Docker", "Figma", "HTML/CSS", "Tailwind CSS",
-  "GraphQL", "REST APIs", "MongoDB", "PostgreSQL", "Redux"
+const skillSuggestionsByTarget: Record<string, string[]> = {
+  general: ["Communication", "Problem Solving", "Time Management", "Teamwork", "Organization", "Customer Service"],
+  retail_hospitality: ["POS Systems", "Upselling", "Cash Handling", "Guest Service", "Inventory", "Complaint Resolution"],
+  admin_operations: ["Calendar Management", "Data Entry", "Microsoft Office", "Scheduling", "Documentation", "Process Coordination"],
+  healthcare: ["Patient Care", "EMR/EHR", "Medical Terminology", "HIPAA Compliance", "Care Coordination", "Vital Signs"],
+  education: ["Lesson Planning", "Classroom Management", "Curriculum Design", "Student Assessment", "Parent Communication", "Differentiated Instruction"],
+  sales: ["Lead Generation", "CRM", "Negotiation", "Account Management", "Pipeline Management", "Closing"],
+  skilled_trades: ["Preventive Maintenance", "Blueprint Reading", "Safety Compliance", "Equipment Operation", "Troubleshooting", "Quality Control"],
+  technology: ["JavaScript", "TypeScript", "React", "Node.js", "SQL", "Git"],
+};
+
+const jobTargets = [
+  { id: "general", label: "General / Any Industry" },
+  { id: "retail_hospitality", label: "Retail / Hospitality" },
+  { id: "admin_operations", label: "Admin / Operations" },
+  { id: "healthcare", label: "Healthcare" },
+  { id: "education", label: "Education" },
+  { id: "sales", label: "Sales" },
+  { id: "skilled_trades", label: "Skilled Trades" },
+  { id: "technology", label: "Technology" },
 ];
 
 const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newSkill, setNewSkill] = useState("");
   const [initialValues, setInitialValues] = useState({ skills: [] as string[] });
+  const [jobTarget, setJobTarget] = useState("general");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -38,6 +55,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
     } else {
       setInitialValues({ skills: [] });
     }
+    setJobTarget(loadJobTarget());
     setIsLoading(false);
   }, []);
 
@@ -50,6 +68,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
     setIsSubmitting(true);
     try {
       saveSkills(values.skills);
+      saveJobTarget(jobTarget);
       notifyResumeUpdate();
       onNext();
     } catch (error) {
@@ -84,7 +103,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Skills</h2>
         </div>
         <p className="text-gray-600 dark:text-gray-300">
-          Add your technical and professional skills. These help recruiters find you.
+          Add your strengths and pick a job target to get industry-specific skill suggestions.
         </p>
       </div>
 
@@ -184,12 +203,26 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
 
               {/* Suggested Skills */}
               <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  Job Target
+                </label>
+                <select
+                  value={jobTarget}
+                  onChange={(e) => setJobTarget(e.target.value)}
+                  className="w-full mb-4 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                >
+                  {jobTargets.map((target) => (
+                    <option key={target.id} value={target.id}>
+                      {target.label}
+                    </option>
+                  ))}
+                </select>
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-500" />
-                  Suggested Skills
+                  Suggested Skills for {jobTargets.find((target) => target.id === jobTarget)?.label || "Selected Target"}
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {suggestedSkills
+                  {(skillSuggestionsByTarget[jobTarget] || skillSuggestionsByTarget.general)
                     .filter((skill) => !values.skills.includes(skill))
                     .map((skill) => (
                       <button
@@ -231,9 +264,11 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
               <button
                 type="button"
                 onClick={() => {
-                      clearSkills();
-                      setFieldValue("skills", []);
-                    }}
+                  clearSkills();
+                  clearJobTarget();
+                  setFieldValue("skills", []);
+                  setJobTarget("general");
+                }}
                 className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -245,6 +280,7 @@ const SkillsDetails: React.FC<SkillsDetailsProps> = ({ onNext }) => {
                   type="button"
                   onClick={() => {
                     saveSkills(values.skills);
+                    saveJobTarget(jobTarget);
                     notifyResumeUpdate();
                   }}
                   className="px-6 py-3 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl transition-colors"

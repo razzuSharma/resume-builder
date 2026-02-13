@@ -7,6 +7,7 @@ import {
   User,
   GraduationCap,
   Briefcase,
+  HandHeart,
   FolderGit2,
   Heart,
   Wand2,
@@ -23,6 +24,7 @@ import EducationDetails from "../pages/EducationDetails";
 import ExperienceDetails from "../pages/ExperienceDetails";
 import SkillsDetails from "../pages/SkillsDetails";
 import ProjectDetails from "../pages/ProjectDetails";
+import VolunteerDetails from "../pages/VolunteerDetails";
 import HobbiesDetails from "../pages/HobbiesDetails";
 import LivePreview from "../components/LivePreview";
 import { 
@@ -30,6 +32,7 @@ import {
   loadPersonalDetails,
   loadEducationDetails,
   loadExperienceDetails,
+  loadVolunteerDetails,
   loadProjectDetails,
   loadSkills,
   loadHobbies 
@@ -84,8 +87,16 @@ const ResumePage = () => {
       hasData: () => loadExperienceDetails().length > 0,
     },
     {
+      id: "VolunteerDetails",
+      label: "Volunteer",
+      icon: HandHeart,
+      component: VolunteerDetails,
+      color: "from-fuchsia-500 to-purple-500",
+      hasData: () => loadVolunteerDetails().length > 0,
+    },
+    {
       id: "ProjectDetails",
-      label: "Projects",
+      label: "Work Samples",
       icon: FolderGit2,
       component: ProjectDetails,
       color: "from-emerald-500 to-teal-500",
@@ -118,6 +129,13 @@ const ResumePage = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Live preview is desktop-only
+  useEffect(() => {
+    if (isMobile && showPreview) {
+      setShowPreview(false);
+    }
+  }, [isMobile, showPreview]);
 
   // Hydrate completed steps from localStorage on mount
   useEffect(() => {
@@ -269,18 +287,20 @@ const ResumePage = () => {
             </button>
           </div>
 
-          <button
-            onClick={() => setShowPreview(!showPreview)}
-            className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors ${
-              showPreview
-                ? "bg-teal-600 text-white"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-            }`}
-          >
-            <Eye className="w-4 h-4" />
-            <span className="hidden sm:inline">{showPreview ? "Hide Preview" : "Live Preview"}</span>
-            <span className="sm:hidden">Preview</span>
-          </button>
+          {!isMobile && (
+            <button
+              onClick={() => setShowPreview(!showPreview)}
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors ${
+                showPreview
+                  ? "bg-teal-600 text-white"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+              }`}
+            >
+              <Eye className="w-4 h-4" />
+              <span className="hidden sm:inline">{showPreview ? "Hide Preview" : "Live Preview"}</span>
+              <span className="sm:hidden">Preview</span>
+            </button>
+          )}
 
           <button
             onClick={() => router.push("/resume")}
@@ -479,12 +499,14 @@ const ResumePage = () => {
       </div>
 
       {/* Live Preview Panel */}
-      <LivePreview
-        isOpen={showPreview}
-        onClose={() => setShowPreview(false)}
-        template={selectedTemplate}
-        colorVariant={colorVariant}
-      />
+      {!isMobile && (
+        <LivePreview
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          template={selectedTemplate}
+          colorVariant={colorVariant}
+        />
+      )}
     </div>
   );
 };

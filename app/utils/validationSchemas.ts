@@ -111,7 +111,7 @@ export const experienceSchema = Yup.object({
         .of(Yup.string())
         .optional(),
     })
-  ).min(1, "At least one experience entry is required"),
+  ),
 });
 
 // Project Schema
@@ -119,8 +119,8 @@ export const projectSchema = Yup.object({
   projects: Yup.array().of(
     Yup.object({
       name: Yup.string()
-        .min(2, "Project name must be at least 2 characters")
-        .required("Project name is required"),
+        .min(2, "Title must be at least 2 characters")
+        .required("Title is required"),
       start_date: Yup.date()
         .required("Start date is required"),
       end_date: Yup.date()
@@ -138,14 +138,49 @@ export const projectSchema = Yup.object({
       github_link: Yup.string()
         .test("is-valid-url", "Enter a valid URL", isValidUrl)
         .optional(),
+      role: Yup.string()
+        .max(120, "Role must be less than 120 characters")
+        .optional(),
       description: Yup.string()
         .min(10, "Description must be at least 10 characters")
         .required("Description is required"),
+      outcome: Yup.string()
+        .max(300, "Outcome must be less than 300 characters")
+        .optional(),
       technologies: Yup.array()
         .of(Yup.string())
         .optional(),
     })
-  ).min(1, "At least one project is required"),
+  ),
+});
+
+// Volunteer Schema
+export const volunteerSchema = Yup.object({
+  volunteer_experiences: Yup.array().of(
+    Yup.object({
+      organization_name: Yup.string()
+        .min(2, "Organization name must be at least 2 characters")
+        .required("Organization name is required"),
+      role: Yup.string()
+        .min(2, "Role must be at least 2 characters")
+        .required("Role is required"),
+      location: Yup.string().optional(),
+      start_date: Yup.date()
+        .required("Start date is required"),
+      end_date: Yup.date()
+        .when("present", {
+          is: true,
+          then: () => Yup.date().nullable(),
+          otherwise: () => Yup.date()
+            .min(Yup.ref("start_date"), "End date must be after start date")
+            .nullable(),
+        }),
+      present: Yup.boolean(),
+      contributions: Yup.array()
+        .of(Yup.string())
+        .min(1, "At least one contribution is required"),
+    })
+  ),
 });
 
 // Skills Schema

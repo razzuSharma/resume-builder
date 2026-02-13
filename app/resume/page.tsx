@@ -2,8 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Download,
@@ -29,18 +27,19 @@ import {
   loadPersonalDetails,
   loadEducationDetails,
   loadExperienceDetails,
+  loadVolunteerDetails,
   loadProjectDetails,
   loadSkills,
   loadHobbies,
 } from "../lib/storage";
 
-const colorVariants: { id: ColorVariant; name: string; color: string }[] = [
-  { id: "slate", name: "Slate", color: "bg-slate-600" },
-  { id: "teal", name: "Teal", color: "bg-teal-600" },
-  { id: "navy", name: "Navy", color: "bg-blue-700" },
-  { id: "rose", name: "Rose", color: "bg-rose-600" },
-  { id: "forest", name: "Forest", color: "bg-green-700" },
-  { id: "violet", name: "Violet", color: "bg-violet-600" },
+const colorVariants: { id: ColorVariant; name: string; hex: string }[] = [
+  { id: "slate", name: "Slate", hex: "#334155" },
+  { id: "teal", name: "Teal", hex: "#0d9488" },
+  { id: "navy", name: "Navy", hex: "#1d4ed8" },
+  { id: "rose", name: "Rose", hex: "#e11d48" },
+  { id: "forest", name: "Forest", hex: "#15803d" },
+  { id: "violet", name: "Violet", hex: "#7c3aed" },
 ];
 
 const templates = [
@@ -52,6 +51,7 @@ interface ResumeData {
   personal_details: any[];
   education_details: any[];
   experience_details: any[];
+  volunteer_details: any[];
   skills: any[];
   project_details: any[];
   hobbies: any[];
@@ -86,6 +86,7 @@ const ResumePage: React.FC = () => {
     personal_details: [],
     education_details: [],
     experience_details: [],
+    volunteer_details: [],
     skills: [],
     project_details: [],
     hobbies: [],
@@ -107,6 +108,7 @@ const ResumePage: React.FC = () => {
       const personal = loadPersonalDetails();
       const education = loadEducationDetails();
       const experience = loadExperienceDetails();
+      const volunteer = loadVolunteerDetails();
       const projects = loadProjectDetails();
       const skillsRaw = loadSkills();
       const hobbiesRaw = loadHobbies();
@@ -115,6 +117,7 @@ const ResumePage: React.FC = () => {
         personal_details: personal ? [personal] : [],
         education_details: education,
         experience_details: experience,
+        volunteer_details: volunteer,
         project_details: projects,
         skills: skillsRaw.map((s: string, i: number) => ({ id: i, skill_name: s })),
         hobbies: hobbiesRaw.map((h: string, i: number) => ({ id: i, hobby_name: h })),
@@ -132,60 +135,14 @@ const ResumePage: React.FC = () => {
 
   const generatePDF = async () => {
     if (!pdfRef.current) return;
-
     setIsGeneratingPDF(true);
     try {
-      const element = pdfRef.current;
-      const rect = element.getBoundingClientRect();
-      
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        width: rect.width,
-        height: rect.height,
-        windowWidth: rect.width,
-        windowHeight: rect.height,
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdfWidth = 210;
-      const pdfHeight = 297;
-      
-      const pdf = new jsPDF("p", "mm", "a4");
-      
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      let heightLeft = imgHeight * ratio;
-      let position = 0;
-      let pageCount = 0;
-
-      pdf.addImage(imgData, "PNG", imgX, position, imgWidth * ratio, imgHeight * ratio);
-      heightLeft -= pdfHeight;
-
-      while (heightLeft >= 0 && pageCount < 5) {
-        position = heightLeft - imgHeight * ratio;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", imgX, position, imgWidth * ratio, imgHeight * ratio);
-        heightLeft -= pdfHeight;
-        pageCount++;
-      }
-
-      const personal = data.personal_details[0];
-      const fileName = personal
-        ? `${personal.first_name}_${personal.last_name}_Resume.pdf`
-        : "My_Resume.pdf";
-
-      pdf.save(fileName);
+      window.print();
       setPdfGenerated(true);
       setTimeout(() => setPdfGenerated(false), 3000);
     } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Failed to generate PDF. Please try again.");
+      console.error("Error opening print dialog:", error);
+      alert("Failed to open print dialog. Please try again.");
     } finally {
       setIsGeneratingPDF(false);
     }
@@ -334,7 +291,7 @@ const ResumePage: React.FC = () => {
                             colorVariant === variant.id ? "bg-gray-100 dark:bg-gray-700" : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
                           }`}
                         >
-                          <div className={`w-4 h-4 rounded-full ${variant.color}`} />
+                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: variant.hex }} />
                           <span className={`text-sm ${colorVariant === variant.id ? "font-medium text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"}`}>
                             {variant.name}
                           </span>
@@ -405,6 +362,7 @@ const ResumePage: React.FC = () => {
                 personal_details={data.personal_details}
                 education_details={data.education_details}
                 experience_details={data.experience_details}
+                volunteer_details={data.volunteer_details}
                 skills={data.skills}
                 project_details={data.project_details}
                 hobbies={data.hobbies}

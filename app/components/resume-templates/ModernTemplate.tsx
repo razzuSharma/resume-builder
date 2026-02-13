@@ -15,6 +15,7 @@ interface ModernTemplateProps {
   personal_details: any[];
   education_details: any[];
   experience_details: any[];
+  volunteer_details?: any[];
   skills: any[];
   project_details: any[];
   hobbies: any[];
@@ -37,6 +38,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
   personal_details,
   education_details,
   experience_details,
+  volunteer_details = [],
   skills,
   project_details,
   hobbies,
@@ -54,11 +56,18 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
   const getSkills = () => {
     if (skills.length === 0) return [];
     try {
-      const skillData = skills[0];
-      if (typeof skillData.skills === "string") {
-        return JSON.parse(skillData.skills);
+      if (skills.every((skill) => typeof skill === "string")) {
+        return skills as string[];
       }
-      return skillData.skills || [];
+      const skillData = skills[0];
+      if (typeof skillData?.skills === "string") return JSON.parse(skillData.skills);
+      if (Array.isArray(skillData?.skills)) return skillData.skills;
+      if (typeof skillData?.skill_name === "string") {
+        return skills
+          .map((skill: any) => skill?.skill_name)
+          .filter((skill: unknown): skill is string => typeof skill === "string" && skill.trim().length > 0);
+      }
+      return [];
     } catch {
       return [];
     }
@@ -67,11 +76,18 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
   const getHobbies = () => {
     if (hobbies.length === 0) return [];
     try {
-      const hobbyData = hobbies[0];
-      if (typeof hobbyData.hobbies === "string") {
-        return JSON.parse(hobbyData.hobbies);
+      if (hobbies.every((hobby) => typeof hobby === "string")) {
+        return hobbies as string[];
       }
-      return hobbyData.hobbies || [];
+      const hobbyData = hobbies[0];
+      if (typeof hobbyData?.hobbies === "string") return JSON.parse(hobbyData.hobbies);
+      if (Array.isArray(hobbyData?.hobbies)) return hobbyData.hobbies;
+      if (typeof hobbyData?.hobby_name === "string") {
+        return hobbies
+          .map((hobby: any) => hobby?.hobby_name)
+          .filter((hobby: unknown): hobby is string => typeof hobby === "string" && hobby.trim().length > 0);
+      }
+      return [];
     } catch {
       return [];
     }
@@ -443,6 +459,65 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
             </section>
           )}
 
+          {/* Volunteer Experience */}
+          {volunteer_details.length > 0 && (
+            <section style={{ marginBottom: "6mm" }}>
+              <h2 style={{
+                fontSize: "11pt",
+                fontWeight: 700,
+                marginBottom: "3mm",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--resume-accent, #0f766e)",
+              }}>
+                Volunteer Experience
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4mm" }}>
+                {volunteer_details.map((volunteer, index) => (
+                  <div key={index}>
+                    <h3 style={{
+                      fontSize: "10.5pt",
+                      fontWeight: 700,
+                      marginBottom: "0.5mm",
+                      color: "var(--resume-text, #0f172a)",
+                    }}>
+                      {volunteer.role}
+                    </h3>
+                    <p style={{
+                      fontSize: "10pt",
+                      fontWeight: 600,
+                      marginBottom: "0.5mm",
+                      color: "var(--resume-accent, #0f766e)",
+                    }}>
+                      {volunteer.organization_name}
+                    </p>
+                    <p style={{
+                      fontSize: "9pt",
+                      marginBottom: "1.5mm",
+                      color: "var(--resume-text-muted, #475569)",
+                    }}>
+                      {formatDate(volunteer.start_date)} - {volunteer.present ? "Present" : formatDate(volunteer.end_date)}
+                      {volunteer.location && ` | ${volunteer.location}`}
+                    </p>
+                    {volunteer.contributions && volunteer.contributions.length > 0 && (
+                      <ul style={{
+                        margin: 0,
+                        paddingLeft: "4mm",
+                        fontSize: "9.5pt",
+                        lineHeight: 1.5,
+                        color: "var(--resume-text-muted, #475569)",
+                      }}>
+                        {volunteer.contributions.map((item: string, i: number) =>
+                          item ? <li key={i} style={{ marginBottom: "0.5mm" }}>{item}</li> : null
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Education */}
           {education_details.length > 0 && (
             <section style={{ marginBottom: "6mm" }}>
@@ -493,7 +568,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
             </section>
           )}
 
-          {/* Projects */}
+          {/* Work Samples */}
           {project_details.length > 0 && (
             <section style={{ marginBottom: "6mm" }}>
               <h2 style={{
@@ -504,7 +579,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
                 letterSpacing: "0.1em",
                 color: "var(--resume-accent, #0f766e)",
               }}>
-                Projects
+                Work Samples
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "3mm" }}>
                 {project_details.map((project, index) => (
@@ -515,7 +590,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
                       marginBottom: "0.5mm",
                       color: "var(--resume-text, #0f172a)",
                     }}>
-                      {project.name}
+                      {project.name || project.title}
                     </h3>
                     <p style={{
                       fontSize: "9pt",
@@ -524,22 +599,42 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({
                     }}>
                       {formatDate(project.start_date)} - {project.present ? "Present" : formatDate(project.end_date)}
                     </p>
-                    {project.technologies && project.technologies.length > 0 && (
+                    {(project.role || project.your_role) && (
                       <p style={{
                         fontSize: "9pt",
                         marginBottom: "1mm",
                         color: "var(--resume-accent, #0f766e)",
                       }}>
-                        {project.technologies.join(" • ")}
+                        <strong>Role:</strong> {project.role || project.your_role}
                       </p>
                     )}
-                    <p style={{
-                      fontSize: "9.5pt",
-                      lineHeight: 1.5,
-                      color: "var(--resume-text-muted, #475569)",
-                    }}>
-                      {project.description}
-                    </p>
+                    {project.description && (
+                      <p style={{
+                        fontSize: "9.5pt",
+                        lineHeight: 1.5,
+                        color: "var(--resume-text-muted, #475569)",
+                      }}>
+                        {project.description}
+                      </p>
+                    )}
+                    {(project.outcome || project.result) && (
+                      <p style={{
+                        fontSize: "9pt",
+                        marginTop: "0.8mm",
+                        color: "var(--resume-accent, #0f766e)",
+                      }}>
+                        <strong>Outcome:</strong> {project.outcome || project.result}
+                      </p>
+                    )}
+                    {project.technologies && project.technologies.length > 0 && (
+                      <p style={{
+                        fontSize: "9pt",
+                        marginTop: "0.8mm",
+                        color: "var(--resume-text-muted, #475569)",
+                      }}>
+                        <strong>Tools/Skills:</strong> {project.technologies.join(" • ")}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>

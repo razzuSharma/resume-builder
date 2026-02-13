@@ -29,7 +29,9 @@ interface Project {
   present: boolean;
   link: string;
   github_link: string;
+  role: string;
   description: string;
+  outcome: string;
   technologies: string[];
   newTech?: string;
 }
@@ -83,7 +85,7 @@ const ProjectCard = ({
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-gray-900 dark:text-white truncate">
-              {project.name || `Project ${index + 1}`}
+              {project.name || `Work Sample ${index + 1}`}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
               {project.description
@@ -126,15 +128,15 @@ const ProjectCard = ({
           >
             <div className="p-4 pt-0 border-t border-gray-100 dark:border-gray-700">
               <div className="grid md:grid-cols-2 gap-4 pt-4">
-                {/* Project Name */}
+                {/* Work Sample Title */}
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                     <FolderGit2 className="w-4 h-4 text-emerald-500" />
-                    Project Name *
+                    Work Sample / Project / Key Work Title *
                   </label>
                   <Field
                     name={`projects.${index}.name`}
-                    placeholder="E-Commerce Platform"
+                    placeholder="Community Health Outreach Program"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                   <ErrorMessage
@@ -144,38 +146,51 @@ const ProjectCard = ({
                   />
                 </div>
 
-                {/* Project Link */}
+                {/* Primary Link */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                     <Link className="w-4 h-4 text-emerald-500" />
-                    Live Demo URL
+                    Reference Link (Optional)
                   </label>
                   <div className="relative">
                     <Field
                       name={`projects.${index}.link`}
                       type="url"
-                      placeholder="https://myproject.com"
+                      placeholder="https://portfolio.example.com/work-sample"
                       className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     />
                     <ExternalLink className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </div>
                 </div>
 
-                {/* GitHub Link */}
+                {/* Supporting Link */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                     <Github className="w-4 h-4 text-emerald-500" />
-                    GitHub URL
+                    Supporting Link (Optional)
                   </label>
                   <div className="relative">
                     <Field
                       name={`projects.${index}.github_link`}
                       type="url"
-                      placeholder="https://github.com/username/project"
+                      placeholder="https://drive.google.com/... or https://github.com/..."
                       className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     />
                     <Github className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </div>
+                </div>
+
+                {/* Role */}
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-emerald-500" />
+                    Your Role (Optional)
+                  </label>
+                  <Field
+                    name={`projects.${index}.role`}
+                    placeholder="Program Lead, Coordinator, Assistant, Analyst"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  />
                 </div>
 
                 {/* Start Date */}
@@ -219,17 +234,17 @@ const ProjectCard = ({
                       className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-emerald-600 focus:ring-emerald-500"
                     />
                     <span className="text-sm font-medium text-emerald-900 dark:text-emerald-300">
-                      This project is ongoing
+                      This work is ongoing
                     </span>
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 ml-auto" />
                   </label>
                 </div>
 
-                {/* Technologies */}
+                {/* Tools / Skills / Methods */}
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                     <Wand2 className="w-4 h-4 text-emerald-500" />
-                    Technologies Used
+                    Tools / Skills / Methods Used (Optional)
                   </label>
                   <FieldArray name={`projects.${index}.technologies`}>
                     {({ push, remove }) => (
@@ -254,7 +269,7 @@ const ProjectCard = ({
                         <div className="flex gap-2">
                           <Field
                             name={`projects.${index}.newTech`}
-                            placeholder="Add technology (e.g., React, Node.js)"
+                            placeholder="Add tool or skill (e.g., CRM, Excel, Canva, React)"
                             className="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
                             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                               if (e.key === "Enter") {
@@ -291,19 +306,34 @@ const ProjectCard = ({
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                     <FileText className="w-4 h-4 text-emerald-500" />
-                    Project Description *
+                    What You Did *
                   </label>
                   <Field
                     as="textarea"
                     name={`projects.${index}.description`}
                     rows={4}
-                    placeholder="Describe your project, what problem it solves, and your role..."
+                    placeholder="Describe the work, your responsibilities, and the impact..."
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                   <ErrorMessage
                     name={`projects.${index}.description`}
                     component="div"
                     className="text-sm text-red-500 dark:text-red-400"
+                  />
+                </div>
+
+                {/* Outcome */}
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-emerald-500" />
+                    Outcome / Result (Optional)
+                  </label>
+                  <Field
+                    as="textarea"
+                    name={`projects.${index}.outcome`}
+                    rows={2}
+                    placeholder="Example: Improved customer satisfaction by 18% in one quarter."
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   />
                 </div>
               </div>
@@ -330,19 +360,8 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
       // Generate stable IDs for saved projects
       setProjectIds(savedData.map(() => generateProjectId()));
     } else {
-      const defaultProject = {
-        name: "",
-        start_date: "",
-        end_date: "",
-        present: false,
-        link: "",
-        github_link: "",
-        description: "",
-        technologies: [],
-        newTech: "",
-      };
-      setInitialValues({ projects: [defaultProject] });
-      setProjectIds([generateProjectId()]);
+      setInitialValues({ projects: [] });
+      setProjectIds([]);
     }
     setIsLoading(false);
   }, []);
@@ -371,7 +390,9 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
       present: false,
       link: "",
       github_link: "",
+      role: "",
       description: "",
+      outcome: "",
       technologies: [],
       newTech: "",
     };
@@ -417,10 +438,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
             <FolderGit2 className="w-5 h-5 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Projects</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Work Samples</h2>
         </div>
         <p className="text-gray-600 dark:text-gray-300">
-          Showcase your projects and portfolio work. Highlight what you built and technologies used.
+          Add projects, portfolio items, case studies, campaigns, or key work samples. You can skip this section.
         </p>
       </div>
 
@@ -449,7 +470,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
                           setExpandedIndex(expandedIndex === index ? -1 : index)
                         }
                         onRemove={() => handleRemoveProject(remove, index, values)}
-                        canRemove={values.projects.length > 1}
+                        canRemove={values.projects.length > 0}
                         projectId={projectIds[index] || String(index)}
                       />
                     ))}
@@ -464,7 +485,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
                     className="w-full py-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-400 hover:border-emerald-400 dark:hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all duration-200 flex items-center justify-center gap-2"
                   >
                     <Plus className="w-5 h-5" />
-                    Add Project
+                    Add Work Sample
                   </motion.button>
                 </div>
               )}
@@ -478,21 +499,11 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ onNext }) => {
                   clearProjectDetails();
                   resetForm({
                     values: {
-                      projects: [{
-                        name: "",
-                        start_date: "",
-                        end_date: "",
-                        present: false,
-                        link: "",
-                        github_link: "",
-                        description: "",
-                        technologies: [],
-                        newTech: "",
-                      }],
+                      projects: [],
                     },
                   });
-                  setProjectIds([generateProjectId()]);
-                  setExpandedIndex(0);
+                  setProjectIds([]);
+                  setExpandedIndex(-1);
                 }}
                 className="inline-flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
               >

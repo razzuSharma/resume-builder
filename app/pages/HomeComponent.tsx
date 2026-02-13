@@ -42,19 +42,19 @@ const HomeComponent = () => {
 
   const testimonials = [
     {
-      quote: "Got hired within 2 weeks of using this resume builder!",
-      author: "Sarah M.",
-      role: "Software Engineer",
+      quote: "Created my resume in minutes and got hired. Thank you Resume Artisan!",
+      author: "Dipesh Bhandari.",
+      role: "Full Stack Developer",
     },
     {
       quote: "The templates are beautiful and professional. Highly recommend!",
-      author: "James L.",
-      role: "Marketing Manager",
+      author: "Nitesh Neupane",
+      role: "Frontend Developer",
     },
     {
       quote: "Best free resume builder I've ever used. So easy!",
-      author: "Emily R.",
-      role: "Recent Graduate",
+      author: "Ngamesh Bhandari",
+      role: "Software Engineer",
     },
   ];
 
