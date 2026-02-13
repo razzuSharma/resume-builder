@@ -346,7 +346,7 @@ const ResumePage: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="print:m-0 print:shadow-none"
+            className="print:m-0 print:shadow-none print-reset-transform"
             style={{ 
               transform: `scale(${previewScale})`, 
               transformOrigin: "top center", 
@@ -355,6 +355,7 @@ const ResumePage: React.FC = () => {
           >
             <div
               ref={pdfRef}
+              id="resume-print-root"
               className={`resume-paper resume-variant-${colorVariant} bg-white shadow-2xl print:shadow-none`}
               style={{ width: "210mm", minHeight: "297mm", boxSizing: "border-box" }}
             >
