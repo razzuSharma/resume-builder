@@ -154,7 +154,7 @@ const EuropassTemplate: React.FC<EuropassTemplateProps> = ({
 
       <header style={{ marginBottom: "5mm", paddingTop: "7mm" }}>
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "2mm" }}>
-          <Image src="/Europass.png" alt="Europass" width={211} height={56} style={{ width: "50mm", height: "auto" }} priority />
+          <Image src="/Europass-Logo-Transparent.png" alt="Europass" width={211} height={56} style={{ width: "50mm", height: "auto" }} priority />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "40mm 1fr", gap: "7mm", alignItems: "start" }}>
