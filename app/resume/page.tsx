@@ -20,10 +20,12 @@ import {
   LayoutTemplate,
   AlertTriangle,
   Gauge,
+  Type,
 } from "lucide-react";
 import ModernTemplate from "../components/resume-templates/ModernTemplate";
 import ClassicTemplate from "../components/resume-templates/ClassicTemplate";
 import { CompactTemplate, ExecutiveTemplate, MinimalTemplate } from "../components/resume-templates/ExtendedTemplates";
+import EuropassTemplate from "../components/resume-templates/EuropassTemplate";
 import DataManager from "../components/DataManager";
 import { useTheme, type ColorVariant } from "../components/ThemeProvider";
 import {
@@ -33,6 +35,11 @@ import {
   loadVolunteerDetails,
   loadProjectDetails,
   loadJobTarget,
+  loadSelectedTemplate,
+  saveSelectedTemplate,
+  loadResumeFontSize,
+  saveResumeFontSize,
+  type ResumeFontSize,
   loadSkills,
   loadHobbies,
 } from "../lib/storage";
@@ -45,6 +52,12 @@ const colorVariants: { id: ColorVariant; name: string; hex: string }[] = [
   { id: "rose", name: "Rose", hex: "#e11d48" },
   { id: "forest", name: "Forest", hex: "#15803d" },
   { id: "violet", name: "Violet", hex: "#7c3aed" },
+];
+
+const fontSizeOptions: { id: ResumeFontSize; label: string; scale: number }[] = [
+  { id: "small", label: "Small", scale: 0.92 },
+  { id: "medium", label: "Medium", scale: 1 },
+  { id: "large", label: "Large", scale: 1.08 },
 ];
 
 interface ResumeData {
@@ -80,6 +93,7 @@ const ResumePage: React.FC = () => {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showDataManager, setShowDataManager] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("classic");
+  const [resumeFontSize, setResumeFontSize] = useState<ResumeFontSize>("medium");
   const [jobTarget, setJobTarget] = useState("general");
   const [isAtsExpanded, setIsAtsExpanded] = useState(false);
   const [previewScale, setPreviewScale] = useState(1);
@@ -115,6 +129,8 @@ const ResumePage: React.FC = () => {
       const skillsRaw = loadSkills();
       const hobbiesRaw = loadHobbies();
       const target = loadJobTarget();
+      const selected = loadSelectedTemplate() as TemplateId;
+      const savedFontSize = loadResumeFontSize();
 
       setData({
         personal_details: personal ? [personal] : [],
@@ -126,6 +142,8 @@ const ResumePage: React.FC = () => {
         hobbies: hobbiesRaw.map((h: string, i: number) => ({ id: i, hobby_name: h })),
       });
       setJobTarget(target);
+      setSelectedTemplate(selected);
+      setResumeFontSize(savedFontSize);
       setLoading(false);
     };
 
@@ -170,6 +188,8 @@ const ResumePage: React.FC = () => {
         return ExecutiveTemplate;
       case "minimal":
         return MinimalTemplate;
+      case "europass":
+        return EuropassTemplate;
       case "classic":
       default:
         return ClassicTemplate;
@@ -368,6 +388,7 @@ const ResumePage: React.FC = () => {
                           key={template.id}
                           onClick={() => {
                             setSelectedTemplate(template.id);
+                            saveSelectedTemplate(template.id);
                             setShowTemplatePicker(false);
                           }}
                           className={`p-2 rounded-lg text-left border transition-colors ${
@@ -434,6 +455,27 @@ const ResumePage: React.FC = () => {
               </AnimatePresence>
             </div>
 
+            {/* Font Size Selector */}
+            <div className="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1">
+              <span className="px-2 text-gray-500"><Type className="w-4 h-4" /></span>
+              {fontSizeOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => {
+                    setResumeFontSize(option.id);
+                    saveResumeFontSize(option.id);
+                  }}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
+                    resumeFontSize === option.id
+                      ? "bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 font-medium"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
             {/* Other buttons */}
             <button onClick={() => setShowDataManager(true)} className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-teal-300 transition-colors">
               <Database className="w-4 h-4 text-gray-500" />
@@ -493,7 +535,10 @@ const ResumePage: React.FC = () => {
               </span>
               {selectedTemplate !== recommendedTemplate && (
                 <button
-                  onClick={() => setSelectedTemplate(recommendedTemplate)}
+                  onClick={() => {
+                    setSelectedTemplate(recommendedTemplate);
+                    saveSelectedTemplate(recommendedTemplate);
+                  }}
                   className="ml-3 px-3 py-1.5 rounded-lg bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 hover:bg-teal-200 dark:hover:bg-teal-500/30 transition-colors"
                 >
                   Apply
@@ -581,16 +626,30 @@ const ResumePage: React.FC = () => {
               className={`resume-paper resume-variant-${colorVariant} resume-template-${selectedTemplate} bg-white shadow-2xl print:shadow-none`}
               style={{ width: "210mm", minHeight: "297mm", boxSizing: "border-box" }}
             >
-              <TemplateComponent
-                personal_details={data.personal_details}
-                education_details={data.education_details}
-                experience_details={data.experience_details}
-                volunteer_details={data.volunteer_details}
-                skills={data.skills}
-                project_details={data.project_details}
-                hobbies={data.hobbies}
-                variant={selectedTemplate}
-              />
+              {selectedTemplate === "europass" ? (
+                <EuropassTemplate
+                  personal_details={data.personal_details}
+                  education_details={data.education_details}
+                  experience_details={data.experience_details}
+                  volunteer_details={data.volunteer_details}
+                  skills={data.skills}
+                  project_details={data.project_details}
+                  hobbies={data.hobbies}
+                  variant={selectedTemplate}
+                  fontScale={fontSizeOptions.find((f) => f.id === resumeFontSize)?.scale ?? 1}
+                />
+              ) : (
+                <TemplateComponent
+                  personal_details={data.personal_details}
+                  education_details={data.education_details}
+                  experience_details={data.experience_details}
+                  volunteer_details={data.volunteer_details}
+                  skills={data.skills}
+                  project_details={data.project_details}
+                  hobbies={data.hobbies}
+                  variant={selectedTemplate}
+                />
+              )}
             </div>
           </motion.div>
         </div>

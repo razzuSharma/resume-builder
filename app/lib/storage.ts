@@ -16,6 +16,8 @@ const STORAGE_KEYS = {
   PROJECT_DETAILS: 'resume_project_details',
   SKILLS: 'resume_skills',
   JOB_TARGET: 'resume_job_target',
+  SELECTED_TEMPLATE: 'resume_selected_template',
+  FONT_SIZE: 'resume_font_size',
   HOBBIES: 'resume_hobbies',
   THEME: 'theme',
   COLOR_VARIANT: 'colorVariant',
@@ -143,6 +145,34 @@ export const clearJobTarget = (): void => {
   localStorage.removeItem(STORAGE_KEYS.JOB_TARGET);
 };
 
+export const saveSelectedTemplate = (data: string) => {
+  saveToStorage(STORAGE_KEYS.SELECTED_TEMPLATE, data);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('resumeTemplateUpdated'));
+  }
+};
+
+export const loadSelectedTemplate = () =>
+  loadFromStorage(STORAGE_KEYS.SELECTED_TEMPLATE, "classic");
+
+export const clearSelectedTemplate = (): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(STORAGE_KEYS.SELECTED_TEMPLATE);
+};
+
+export type ResumeFontSize = "small" | "medium" | "large";
+
+export const saveResumeFontSize = (data: ResumeFontSize) =>
+  saveToStorage(STORAGE_KEYS.FONT_SIZE, data);
+
+export const loadResumeFontSize = (): ResumeFontSize =>
+  loadFromStorage(STORAGE_KEYS.FONT_SIZE, "medium");
+
+export const clearResumeFontSize = (): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(STORAGE_KEYS.FONT_SIZE);
+};
+
 export const saveHobbies = (data: string[]) => 
   saveToStorage(STORAGE_KEYS.HOBBIES, data);
 
@@ -168,23 +198,52 @@ export interface ExportedResumeData {
   projects: unknown[];
   skills: string[];
   jobTarget?: string;
+  selectedTemplate?: string;
+  fontSize?: ResumeFontSize;
   hobbies: string[];
 }
+
+const EUROPASS_ONLY_PERSONAL_FIELDS = [
+  "permanent_address",
+  "nationality",
+  "date_of_birth",
+  "gender",
+  "declaration_text",
+  "passport_number",
+  "passport_issue_date",
+  "passport_expiry_date",
+  "father_name",
+  "marital_status",
+] as const;
+
+const sanitizePersonalByTemplate = (personal: unknown, selectedTemplate: string) => {
+  if (!personal || typeof personal !== "object") return personal;
+  if (selectedTemplate === "europass") return personal;
+
+  const sanitized = { ...(personal as Record<string, unknown>) };
+  EUROPASS_ONLY_PERSONAL_FIELDS.forEach((field) => {
+    delete sanitized[field];
+  });
+  return sanitized;
+};
 
 /**
  * Export all resume data as a JSON object
  */
 export const exportResumeData = (): ExportedResumeData => {
+  const selectedTemplate = loadSelectedTemplate();
   return {
     version: '1.0',
     exportedAt: new Date().toISOString(),
-    personal: loadPersonalDetails(),
+    personal: sanitizePersonalByTemplate(loadPersonalDetails(), selectedTemplate),
     education: loadEducationDetails(),
     experience: loadExperienceDetails(),
     volunteer: loadVolunteerDetails(),
     projects: loadProjectDetails(),
     skills: loadSkills(),
     jobTarget: loadJobTarget(),
+    selectedTemplate,
+    fontSize: loadResumeFontSize(),
     hobbies: loadHobbies(),
   };
 };
@@ -195,13 +254,18 @@ export const exportResumeData = (): ExportedResumeData => {
  */
 export const importResumeData = (data: ExportedResumeData): boolean => {
   try {
-    if (data.personal) savePersonalDetails(data.personal);
+    const selectedTemplate = data.selectedTemplate ?? loadSelectedTemplate();
+    if (data.personal) {
+      savePersonalDetails(sanitizePersonalByTemplate(data.personal, selectedTemplate));
+    }
     if (data.education) saveEducationDetails(data.education);
     if (data.experience) saveExperienceDetails(data.experience);
     if (data.volunteer) saveVolunteerDetails(data.volunteer);
     if (data.projects) saveProjectDetails(data.projects);
     if (data.skills) saveSkills(data.skills);
     if (data.jobTarget) saveJobTarget(data.jobTarget);
+    if (data.selectedTemplate) saveSelectedTemplate(data.selectedTemplate);
+    if (data.fontSize) saveResumeFontSize(data.fontSize);
     if (data.hobbies) saveHobbies(data.hobbies);
     notifyResumeUpdate();
     return true;

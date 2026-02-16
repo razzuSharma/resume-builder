@@ -22,7 +22,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import * as Yup from "yup";
-import { savePersonalDetails, loadPersonalDetails, clearPersonalDetails, notifyResumeUpdate } from "../lib/storage";
+import { savePersonalDetails, loadPersonalDetails, clearPersonalDetails, notifyResumeUpdate, loadSelectedTemplate } from "../lib/storage";
+import type { TemplateId } from "../lib/templates";
 
 interface PersonalDetailsProps {
   onNext: () => void;
@@ -34,12 +35,45 @@ interface MyFormValues {
   email: string;
   phone: string;
   location: string;
+  permanent_address: string;
+  nationality: string;
+  date_of_birth: string;
+  gender: string;
   summary: string;
+  declaration_text: string;
+  passport_number: string;
+  passport_issue_date: string;
+  passport_expiry_date: string;
+  father_name: string;
+  marital_status: string;
   linkedin: string;
   website: string;
   github: string;
   profile_image_url: string;
 }
+
+const DEFAULT_VALUES: MyFormValues = {
+  first_name: "",
+  last_name: "",
+  email: "",
+  phone: "",
+  location: "",
+  permanent_address: "",
+  nationality: "",
+  date_of_birth: "",
+  gender: "",
+  summary: "",
+  declaration_text: "",
+  passport_number: "",
+  passport_issue_date: "",
+  passport_expiry_date: "",
+  father_name: "",
+  marital_status: "",
+  linkedin: "",
+  website: "",
+  github: "",
+  profile_image_url: "",
+};
 
 const personalDetailsSchema = Yup.object({
   first_name: Yup.string().required("First name is required"),
@@ -47,7 +81,17 @@ const personalDetailsSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required"),
   phone: Yup.string().required("Phone is required"),
   location: Yup.string(),
+  permanent_address: Yup.string(),
+  nationality: Yup.string(),
+  date_of_birth: Yup.string(),
+  gender: Yup.string(),
   summary: Yup.string(),
+  declaration_text: Yup.string(),
+  passport_number: Yup.string(),
+  passport_issue_date: Yup.string(),
+  passport_expiry_date: Yup.string(),
+  father_name: Yup.string(),
+  marital_status: Yup.string(),
   linkedin: Yup.string().url("Invalid URL"),
   website: Yup.string().url("Invalid URL"),
   github: Yup.string().url("Invalid URL"),
@@ -106,27 +150,21 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string>("");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("classic");
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [initialValues, setInitialValues] = useState<MyFormValues>({
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone: "",
-    location: "",
-    summary: "",
-    linkedin: "",
-    website: "",
-    github: "",
-    profile_image_url: "",
+    ...DEFAULT_VALUES,
   });
 
   // Load existing data
   useEffect(() => {
     const loadData = () => {
       const savedData = loadPersonalDetails() as MyFormValues | null;
+      const storedTemplate = loadSelectedTemplate() as TemplateId;
+      setSelectedTemplate(storedTemplate);
       if (savedData) {
-        setInitialValues(savedData);
+        setInitialValues({ ...DEFAULT_VALUES, ...savedData });
         if (savedData.profile_image_url) {
           setPreviewImage(savedData.profile_image_url);
         }
@@ -136,6 +174,12 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
     };
 
     loadData();
+
+    const handleTemplateUpdate = () => {
+      setSelectedTemplate(loadSelectedTemplate() as TemplateId);
+    };
+    window.addEventListener("resumeTemplateUpdated", handleTemplateUpdate);
+    return () => window.removeEventListener("resumeTemplateUpdated", handleTemplateUpdate);
   }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void) => {
@@ -196,6 +240,8 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
     );
   }
 
+  const isEuropass = selectedTemplate === "europass";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -222,7 +268,9 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
           </div>
         </div>
         <p className="text-gray-600 dark:text-gray-300">
-          Let&apos;s start with your basic information. This will be the header of your resume.
+          {isEuropass
+            ? "Fill this section for Europass. Europass-specific fields and photo are shown below."
+            : "Let&apos;s start with your basic information. This will be the header of your resume."}
         </p>
       </div>
 
@@ -243,7 +291,17 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
                   setFieldValue("email", "");
                   setFieldValue("phone", "");
                   setFieldValue("location", "");
+                  setFieldValue("permanent_address", "");
+                  setFieldValue("nationality", "");
+                  setFieldValue("date_of_birth", "");
+                  setFieldValue("gender", "");
                   setFieldValue("summary", "");
+                  setFieldValue("declaration_text", "");
+                  setFieldValue("passport_number", "");
+                  setFieldValue("passport_issue_date", "");
+                  setFieldValue("passport_expiry_date", "");
+                  setFieldValue("father_name", "");
+                  setFieldValue("marital_status", "");
                   setFieldValue("linkedin", "");
                   setFieldValue("website", "");
                   setFieldValue("github", "");
@@ -258,6 +316,57 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
           <Form className="space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 lg:p-8">
               <div className="grid md:grid-cols-2 gap-6">
+                {isEuropass && (
+                  <div className="md:col-span-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-2">
+                      <Camera className="w-4 h-4 text-teal-500" />
+                      Profile Photo (Europass)
+                    </label>
+                    <div className="border border-gray-200 dark:border-gray-600 rounded-xl p-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-20 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
+                          {previewImage ? (
+                            <Image src={previewImage} alt="Profile preview" width={80} height={96} className="w-full h-full object-cover" />
+                          ) : (
+                            <Camera className="w-8 h-8 text-gray-400" />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleFileChange(e, setFieldValue)}
+                            className="hidden"
+                            id="profile-image-upload"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-500/20 transition-colors"
+                          >
+                            <Upload className="w-4 h-4" />
+                            Upload Photo
+                          </button>
+                          {previewImage && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(setFieldValue)}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                        JPG/PNG, max 2MB. This image is used in the Europass header preview.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* First Name */}
                 <InputField
                   label="First Name *"
@@ -300,6 +409,38 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
                   icon={MapPin}
                 />
 
+                {isEuropass && (
+                  <>
+                    <InputField
+                      label="Permanent Address"
+                      name="permanent_address"
+                      placeholder="Street, City, Region, Country"
+                      icon={MapPin}
+                    />
+
+                    <InputField
+                      label="Nationality"
+                      name="nationality"
+                      placeholder="Nepalese"
+                      icon={User}
+                    />
+
+                    <InputField
+                      label="Date of Birth"
+                      name="date_of_birth"
+                      type="date"
+                      icon={User}
+                    />
+
+                    <InputField
+                      label="Gender"
+                      name="gender"
+                      placeholder="Male / Female / Other"
+                      icon={User}
+                    />
+                  </>
+                )}
+
                 {/* GitHub */}
                 <InputField
                   label="GitHub URL"
@@ -327,6 +468,45 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
                   icon={Globe}
                 />
 
+                {isEuropass && (
+                  <>
+                    <InputField
+                      label="Passport Number"
+                      name="passport_number"
+                      placeholder="PA2707467"
+                      icon={FileText}
+                    />
+
+                    <InputField
+                      label="Passport Issue Date"
+                      name="passport_issue_date"
+                      type="date"
+                      icon={FileText}
+                    />
+
+                    <InputField
+                      label="Passport Expiry Date"
+                      name="passport_expiry_date"
+                      type="date"
+                      icon={FileText}
+                    />
+
+                    <InputField
+                      label="Father's Name"
+                      name="father_name"
+                      placeholder="Father's full name"
+                      icon={User}
+                    />
+
+                    <InputField
+                      label="Marital Status"
+                      name="marital_status"
+                      placeholder="Single / Married"
+                      icon={User}
+                    />
+                  </>
+                )}
+
                 {/* Summary */}
                 <div className="md:col-span-2">
                   <InputField
@@ -340,6 +520,18 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({ onNext }) => {
                     This appears at the top of your resume. Keep it concise and impactful.
                   </p>
                 </div>
+
+                {isEuropass && (
+                  <div className="md:col-span-2">
+                    <InputField
+                      label="Declaration"
+                      name="declaration_text"
+                      placeholder="I declare that the information given above is true to the best of my knowledge."
+                      icon={FileText}
+                      isTextarea
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

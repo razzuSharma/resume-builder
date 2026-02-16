@@ -11,7 +11,17 @@ export interface PersonalDetails {
   email: string;
   phone: string;
   location?: string;
+  permanent_address?: string;
+  nationality?: string;
+  date_of_birth?: string;
+  gender?: string;
   summary?: string;
+  declaration_text?: string;
+  passport_number?: string;
+  passport_issue_date?: string;
+  passport_expiry_date?: string;
+  father_name?: string;
+  marital_status?: string;
   linkedin?: string;
   website?: string;
   github?: string;
