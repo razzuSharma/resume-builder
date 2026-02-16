@@ -4,7 +4,8 @@ export type TemplateId =
   | "compact"
   | "executive"
   | "minimal"
-  | "creative";
+  | "creative"
+  | "europass";
 
 export interface TemplateOption {
   id: TemplateId;
@@ -20,6 +21,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   { id: "executive", name: "Executive", description: "Boardroom style with strong hierarchy and clean separators", category: "professional" },
   { id: "minimal", name: "Minimal", description: "Elegant serif style with airy spacing and classic lines", category: "ats" },
   { id: "creative", name: "Creative", description: "Visual-forward two-column style for portfolio profiles", category: "creative" },
+  { id: "europass", name: "Europass", description: "European-style CV layout with structured section headings", category: "professional" },
 ];
 
 export interface JobTargetOption {
@@ -45,7 +47,7 @@ const TEMPLATE_RECOMMENDATION_MAP: Record<string, TemplateId> = {
   healthcare: "compact",
   education: "classic",
   sales: "modern",
-  skilled_trades: "compact",
+  skilled_trades: "europass",
   technology: "modern",
 };
 

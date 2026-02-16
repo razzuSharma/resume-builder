@@ -6,6 +6,7 @@ import { X, Eye, EyeOff, Maximize2, Minimize2, GripVertical } from "lucide-react
 import ModernTemplate from "./resume-templates/ModernTemplate";
 import ClassicTemplate from "./resume-templates/ClassicTemplate";
 import { CompactTemplate, ExecutiveTemplate, MinimalTemplate } from "./resume-templates/ExtendedTemplates";
+import EuropassTemplate from "./resume-templates/EuropassTemplate";
 import { useTheme, type ColorVariant } from "./ThemeProvider";
 import { notifyResumeUpdate } from "../lib/storage";
 import type { TemplateId } from "../lib/templates";
@@ -180,6 +181,8 @@ const LivePreview: React.FC<LivePreviewProps> = ({ isOpen, onClose, template = "
         return ExecutiveTemplate;
       case "minimal":
         return MinimalTemplate;
+      case "europass":
+        return EuropassTemplate;
       case "classic":
       default:
         return ClassicTemplate;

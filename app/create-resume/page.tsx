@@ -35,7 +35,9 @@ import {
   loadVolunteerDetails,
   loadProjectDetails,
   loadJobTarget,
+  loadSelectedTemplate,
   saveJobTarget,
+  saveSelectedTemplate,
   loadSkills,
   loadHobbies 
 } from "../lib/storage";
@@ -144,7 +146,9 @@ const ResumePage = () => {
   // Hydrate completed steps from localStorage on mount
   useEffect(() => {
     const target = loadJobTarget();
+    const storedTemplate = loadSelectedTemplate() as TemplateId;
     setJobTarget(target);
+    setSelectedTemplate(storedTemplate);
 
     // Check which steps have existing data
     const stepsWithData = new Set<number>();
@@ -296,7 +300,10 @@ const ResumePage = () => {
                   </span>
                 </p>
                 <button
-                  onClick={() => setSelectedTemplate(recommendedTemplate)}
+                  onClick={() => {
+                    setSelectedTemplate(recommendedTemplate);
+                    saveSelectedTemplate(recommendedTemplate);
+                  }}
                   className="mt-2 px-3 py-2 text-sm rounded-xl bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 hover:bg-teal-200 dark:hover:bg-teal-500/30 transition-colors"
                 >
                   Use Recommended
@@ -308,7 +315,10 @@ const ResumePage = () => {
               {TEMPLATE_OPTIONS.map((template) => (
                 <button
                   key={template.id}
-                  onClick={() => setSelectedTemplate(template.id)}
+                  onClick={() => {
+                    setSelectedTemplate(template.id);
+                    saveSelectedTemplate(template.id);
+                  }}
                   className={`text-left p-3 rounded-xl border transition-colors ${
                     selectedTemplate === template.id
                       ? "border-teal-500 bg-teal-50 dark:bg-teal-500/10"
